@@ -4,10 +4,10 @@ API of the textual index to the LOD Laundromat
 
 #Example calls:
 Candidates:
-http://textindex.fii800.eculture.labs.vu.nl/candidates?query=Amsterdam%20Norwich
+http://textindex.fii800.d2s.labs.vu.nl/candidates?query=Open%20%Season
 
 Fuzzy candidates:
-http://textindex.fii800.eculture.labs.vu.nl/fuzzycandidates?query=Amsterdam%20Norwich
+http://textindex.fii800.d2s.labs.vu.nl/fuzzycandidates?query=Open%20%Season
 
 
 (Directly linked) Identical resources:
