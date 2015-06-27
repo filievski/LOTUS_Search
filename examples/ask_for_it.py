@@ -5,6 +5,13 @@ Created on Jun 27, 2015
 
 import sys
 import os
+import urllib2
+import csv
+
+def lookup_literal(literal, language):
+	url="http://textindex.fii800.d2s.labs.vu.nl/candidates?query=" + literal
+	content = urllib2.urlopen(url).read()
+	print content
 
 
 if __name__ == '__main__':
@@ -16,5 +23,13 @@ if __name__ == '__main__':
 	path=sys.argv[1]
 
 	for file in os.listdir(path):
-		print path + "/" + file
-	
+		fullpath=path + "/" + file
+
+		with open(fullpath, 'rb') as csvfile:
+			spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+			for row in spamreader:
+				if path=="monuments":
+					lookup_literal(row[0], "nl")
+				else: # CONLL or COLD conferences
+					lookup_literal(row[0], "en")
+				sys.exit()
