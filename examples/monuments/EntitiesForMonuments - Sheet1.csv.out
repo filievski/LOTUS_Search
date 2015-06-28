@@ -1,0 +1,113 @@
+Literal,Source,Part of the text,Entity type,ES Time elapsed,# ES Hits
+Westerborkpad,AmsterdamviaWesterborkpadroute,waypoint,MON,1,0
+Herinneringscentrum Kamp Westerbork,AmsterdamviaWesterborkpadroute,waypoint,MON,4,44
+De 9 straatjes,AmsterdamviaWesterborkpadroute,waypoint,MON,4,4
+Hermitage,AmsterdamviaWesterborkpadroute,waypoint,MON,4,25663
+Joods Historisch Museum,AmsterdamviaWesterborkpadroute,waypoint,MON,4,346
+Dokwerker,AmsterdamviaWesterborkpadroute,waypoint,MON,1,101
+Jonas Daniël Meijerplein,AmsterdamviaWesterborkpadroute,waypoint,LOC,2,0
+Joodse wijk,AmsterdamviaWesterborkpadroute,waypoint,LOC,3,163
+Spiegelmonument,AmsterdamviaWesterborkpadroute,waypoint,MON,1,5
+Hollandsche Schouwburg,AmsterdamviaWesterborkpadroute,waypoint,MON,2,91
+Transvaalplein,AmsterdamviaWesterborkpadroute,waypoint,LOC,1,14
+Muiderpoortstation,AmsterdamviaWesterborkpadroute,waypoint,LOC,1,75
+Jan Dokter,AmsterdamviaWesterborkpadroute,in text ,PER,5,0
+Amsterdam,AmsterdamviaWesterborkpadroute,in text,LOC,28,902323
+kamp Westerbork,AmsterdamviaWesterborkpadroute,in text,LOC,3,445
+Duitsland,AmsterdamviaWesterborkpadroute,in text,LOC,6,129881
+Oostenrijk,AmsterdamviaWesterborkpadroute,in text,LOC,5,64544
+Auschwitz,AmsterdamviaWesterborkpadroute,in text,LOC,4,38607
+Sobibor,AmsterdamviaWesterborkpadroute,in text,LOC,2,6476
+Joden,AmsterdamviaWesterborkpadroute,in text,PER,2,9600
+Nederland,AmsterdamviaWesterborkpadroute,in text,LOC,8,294285
+Roma,AmsterdamviaWesterborkpadroute,in text,PER,25,801801
+Sinti,AmsterdamviaWesterborkpadroute,in text,PER,2,3958
+NS-station Amsterdam Centraal,AmsterdamviaWesterborkpadroute,in text,LOC,6,0
+Stationsplein,AmsterdamviaWesterborkpadroute,in text,LOC,102,2060
+Fietsenstalling,AmsterdamviaWesterborkpadroute,in text,LOC,309,631
+Singel,AmsterdamviaWesterborkpadroute,in text,LOC,587,165289
+Brouwersgracht,AmsterdamviaWesterborkpadroute,in text,LOC,405,1491
+Melkmeisjesbrug,AmsterdamviaWesterborkpadroute,in text ,LOC,69,4
+Herengracht,AmsterdamviaWesterborkpadroute,in text,LOC,603,7003
+Herenstraat,AmsterdamviaWesterborkpadroute,in text,LOC,178,2576
+Keizersgracht,AmsterdamviaWesterborkpadroute,in text,LOC,374,7129
+Leliegracht,AmsterdamviaWesterborkpadroute,in text,LOC,390,415
+Prinsengracht,AmsterdamviaWesterborkpadroute,in text,LOC,111,5994
+Anne Frankhuis,AmsterdamviaWesterborkpadroute,in text,MON,1597,111
+Westermarkt,AmsterdamviaWesterborkpadroute,in text,LOC,307,203
+Reestraat,AmsterdamviaWesterborkpadroute,in text,LOC,273,179
+Gouden Eeuw,AmsterdamviaWesterborkpadroute,in text,TIME,1652,2143
+Wolvenstraat ,AmsterdamviaWesterborkpadroute,in text,LOC,239,203
+Koningsplein,AmsterdamviaWesterborkpadroute,in text,LOC,338,776
+Vijzelstraat ,AmsterdamviaWesterborkpadroute,in text,LOC,308,460
+Thorbeckeplein,AmsterdamviaWesterborkpadroute,in text,LOC,337,174
+Rembrandtplein,AmsterdamviaWesterborkpadroute,in text,LOC,563,520
+Bakkersstraat,AmsterdamviaWesterborkpadroute,in text,LOC,138,124
+Amstel,AmsterdamviaWesterborkpadroute,in text ,LOC,272,26994
+Halvemaansbrug,AmsterdamviaWesterborkpadroute,in text,LOC,210,6
+Kloveniersburgwal,AmsterdamviaWesterborkpadroute,in text,LOC,276,1066
+Staalstraat ,AmsterdamviaWesterborkpadroute,in text,LOC,214,172
+B. Bijvoetbrug,AmsterdamviaWesterborkpadroute,in text,LOC,353,11
+Stopera,AmsterdamviaWesterborkpadroute,in text,LOC,613,1047
+Waterlooplein,AmsterdamviaWesterborkpadroute,in text,LOC,536,419
+Walter Süskindbrug,AmsterdamviaWesterborkpadroute,in text,LOC,91,0
+Nieuwe Herengracht,AmsterdamviaWesterborkpadroute,in text,LOC,708,492
+Barent Helleman,AmsterdamviaWesterborkpadroute,in text,PER,639,17
+Diaconie,AmsterdamviaWesterborkpadroute,in text,ORG,423,1005
+Diaconie Oude Vrouwen Huys anno 1681,AmsterdamviaWesterborkpadroute,in text,MON,1312,0
+Amstelhof,AmsterdamviaWesterborkpadroute,in text,MON,92,134
+Hermitage Museum,AmsterdamviaWesterborkpadroute,in text,MON,775,1892
+Russische Hermitage,AmsterdamviaWesterborkpadroute,in text,MON,648,0
+Amstelzijde 51,AmsterdamviaWesterborkpadroute,in text,LOC,546,11
+M.S. Vas Diasbrug,AmsterdamviaWesterborkpadroute,in text ,LOC,266,0
+J.D. Meijerplein,AmsterdamviaWesterborkpadroute,in text,LOC,355,9
+Tweede Wereldoorlog,AmsterdamviaWesterborkpadroute,in text,EVENT,1904,72936
+Mr. Visserplein,AmsterdamviaWesterborkpadroute,in text,LOC,1337,159
+Portugese Synagoge,AmsterdamviaWesterborkpadroute,in text,MON,1043,38
+kamp Schoorl,AmsterdamviaWesterborkpadroute,in text,LOC,728,84
+Buchenwald,AmsterdamviaWesterborkpadroute,in text,LOC,479,10952
+Mauthausen,AmsterdamviaWesterborkpadroute,in text,LOC,406,9479
+Jodenvervolging,AmsterdamviaWesterborkpadroute,in text,CONCEPT,136,390
+Februaristaking,AmsterdamviaWesterborkpadroute,in text,EVENT,341,138
+Mari Andriessen,AmsterdamviaWesterborkpadroute,in text,PER,1557,209
+Spanje,AmsterdamviaWesterborkpadroute,in text,LOC,267,67417
+Portugal,AmsterdamviaWesterborkpadroute,in text,LOC,1161,970177
+Jodenbreestraat,AmsterdamviaWesterborkpadroute,in text,LOC,112,373
+Centraal-Europese Joden,AmsterdamviaWesterborkpadroute,in text,PER,574,0
+Plantage,AmsterdamviaWesterborkpadroute,in text,LOC,555,7253
+Transvaal- en Rivierenbuurt,AmsterdamviaWesterborkpadroute,in text ,LOC,600,0
+Sjoa (Holocaust),AmsterdamviaWesterborkpadroute,in text,EVENT,701,0
+Jodenhoek,AmsterdamviaWesterborkpadroute,in text,LOC,96,20
+Muiderstraat ,AmsterdamviaWesterborkpadroute,in text,LOC,63,112
+Hortus Botanicus,AmsterdamviaWesterborkpadroute,in text,MON,1413,1999
+Plantage Parklaan,AmsterdamviaWesterborkpadroute,in text,LOC,682,29
+Plantage Middenlaan,AmsterdamviaWesterborkpadroute,in text,LOC,648,293
+Wertheimpark,AmsterdamviaWesterborkpadroute,in text,LOC,239,57
+Jan Wolkers,AmsterdamviaWesterborkpadroute,in text,PER,1026,815
+Oosterbegraafplaats,AmsterdamviaWesterborkpadroute,in text,LOC,133,145
+Henri Polaklaan,AmsterdamviaWesterborkpadroute,in text,LOC,700,24
+Plantage Kerklaan,AmsterdamviaWesterborkpadroute,in text,LOC,206,215
+Heijermans,AmsterdamviaWesterborkpadroute,in text,PER,462,860
+Joodsche Schouwburg,AmsterdamviaWesterborkpadroute,in text,MON,54,8
+Vught,AmsterdamviaWesterborkpadroute,in text,LOC,351,4162
+Sint Jacob verzorgingstehuis,AmsterdamviaWesterborkpadroute,in text,MON,698,0
+Sarphatistraat,AmsterdamviaWesterborkpadroute,in text ,LOC,299,234
+Mauritskade,AmsterdamviaWesterborkpadroute,in text,LOC,59,559
+Kon. Instituut voor de Tropen,AmsterdamviaWesterborkpadroute,in text,MON,1500,0
+Linnaeusstraat,AmsterdamviaWesterborkpadroute,in text,LOC,246,150
+Wijtenbachstraat,AmsterdamviaWesterborkpadroute,in text,LOC,42,3
+Oosterpark,AmsterdamviaWesterborkpadroute,in text,LOC,223,585
+Onze Lieve Vrouwe Gasthuis,AmsterdamviaWesterborkpadroute,in text,MON,694,72
+Beukenweg,AmsterdamviaWesterborkpadroute,in text,LOC,259,48
+Beukenplein,AmsterdamviaWesterborkpadroute,in text,LOC,23,5
+Maritzstraat,AmsterdamviaWesterborkpadroute,in text,LOC,141,11
+Krugerplein,AmsterdamviaWesterborkpadroute,in text,LOC,49,12
+Schalk Burgerstraat,AmsterdamviaWesterborkpadroute,in text,LOC,622,19
+Transvaalstraat,AmsterdamviaWesterborkpadroute,in text,LOC,78,402
+Judenviertel,AmsterdamviaWesterborkpadroute,in text,LOC,181,105
+Davidster,AmsterdamviaWesterborkpadroute,in text,CONCEPT,296,153
+Tramlijn 8,AmsterdamviaWesterborkpadroute,in text,CONCEPT,2228,56
+Paardekraalstraat,AmsterdamviaWesterborkpadroute,in text,LOC,85,6
+Pretoriusstraat,AmsterdamviaWesterborkpadroute,in text,LOC,139,26
+Oetewalerpad,AmsterdamviaWesterborkpadroute,in text,LOC,60,11
+Oosterspoorplein,AmsterdamviaWesterborkpadroute,in text,LOC,47,44

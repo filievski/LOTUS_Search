@@ -6,10 +6,10 @@ var request = require('request');
 var SparqlClient = require('sparql-client');
 var util = require('util');
 
-var query_uri = 'http://localhost:9200/lodspot/lodtype/_search';
+var query_url = 'http://localhost:9200/lodspot/lodtype/_search';
 
-function get_candidate_strings(q, callback){
-	data = {"query": { "match": { "addr": q}}};	
+function lookup_simple(q, callback){
+	data = {"query": { "match": { "lexform": {"query": q, "operator": "AND", "type": "phrase"}}}};	
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
 		if (!error && response.statusCode == 200)
 		{
@@ -21,12 +21,33 @@ function get_candidate_strings(q, callback){
 	});
 }
 
+function lookup_phrase(q, callback){
+        data={"query": {
+                "match_phrase": {
+                    "lexform": {
+                        "query" :       q,
+                        "slop" :     	3
+                    }
+                }
+            }};
+
+        request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+                if (!error && response.statusCode == 200)
+                {
+                        console.log(body);
+                        callback(body);
+                } else{
+                        console.log("ERROR" + error);
+                }
+        });
+}
+
 function get_fuzzy_candidate_strings(q, callback){
 	data={"query": {
-		"fuzzy_like_this": {
-		    "query": {
+		"fuzzy_like_this_field": {
+		    "lexform": {
 			"like_text" :         q,
-			"boost":                2.0
+        		"max_query_terms" : 12
 		    }
 		}
 	    }};
@@ -74,7 +95,13 @@ app.get('/', function(req, res){
 });
 
 app.get('/candidates', function(req, res){
-	get_candidate_strings(req.param('query'), function(cands){
+	lookup_simple(req.param('query'), function(cands){
+		res.send(cands);
+	});
+});
+
+app.get('/phrase', function(req, res){
+	lookup_phrase(req.param('query'), function(cands){
 		res.send(cands);
 	});
 });
