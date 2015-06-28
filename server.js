@@ -6,9 +6,11 @@ var request = require('request');
 var SparqlClient = require('sparql-client');
 var util = require('util');
 
+var query_uri = 'http://localhost:9200/lodspot/lodtype/_search';
+
 function get_candidate_strings(q, callback){
 	data = {"query": { "match": { "addr": q}}};	
-	request({url: 'http://localhost:9200/addresses/_search', method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
 		if (!error && response.statusCode == 200)
 		{
 			console.log(body);
@@ -22,14 +24,14 @@ function get_candidate_strings(q, callback){
 function get_fuzzy_candidate_strings(q, callback){
 	data={"query": {
 		"fuzzy_like_this": {
-		    "addr": {
+		    "query": {
 			"like_text" :         q,
 			"boost":                2.0
 		    }
 		}
 	    }};
       
-	request({url: 'http://localhost:9200/addresses/_search', method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
                 if (!error && response.statusCode == 200)
                 {
                         console.log(body);
