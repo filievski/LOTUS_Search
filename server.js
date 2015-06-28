@@ -9,7 +9,13 @@ var util = require('util');
 var query_url = 'http://localhost:9200/lodspot/lodtype/_search';
 
 function lookup_simple(q, callback){
-	data = {"query": { "match": { "lexform": {"query": q, "operator": "AND", "type": "phrase"}}}};	
+	data={"query": { 
+			"match": {
+				"lexform": q
+			}
+    		}
+	}
+//	data = {"query": { "match": { "lexform": {"query": q}}}};	
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
 		if (!error && response.statusCode == 200)
 		{

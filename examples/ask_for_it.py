@@ -29,7 +29,8 @@ if __name__ == '__main__':
 
 	for file in os.listdir(path):
 		fullpath=path + "/" + file
-		with open(fullpath + ".out", "wb") as writefile:	
+		writepath=path + "/out." + file
+		with open(writepath, "wb") as writefile:	
 			spamwriter=csv.writer(writefile, delimiter=',', quotechar='"')
 			spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits"])
 			with open(fullpath, 'rb') as csvfile:
