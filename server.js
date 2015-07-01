@@ -4,17 +4,11 @@ var app = express();
 var async = require('async');
 var request = require('request');
 var SparqlClient = require('sparql-client');
-var util = require('util');
 
-var query_url = 'http://localhost:9200/lodspot/lodtype/_search';
+var query_url = 'http://localhost:9200/laundrospot/_search';
 
 function lookup_simple(q, callback){
-	data={"query": { 
-			"match": {
-				"lexform": q
-			}
-    		}
-	}
+	data={"query": { "match": { "string": q } } };
 //	data = {"query": { "match": { "lexform": {"query": q}}}};	
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
 		if (!error && response.statusCode == 200)
@@ -30,7 +24,7 @@ function lookup_simple(q, callback){
 function lookup_phrase(q, callback){
         data={"query": {
                 "match_phrase": {
-                    "lexform": {
+                    "string": {
                         "query" :       q,
                         "slop" :     	3
                     }
@@ -51,7 +45,7 @@ function lookup_phrase(q, callback){
 function get_fuzzy_candidate_strings(q, callback){
 	data={"query": {
 		"fuzzy_like_this_field": {
-		    "lexform": {
+		    "string": {
 			"like_text" :         q,
         		"max_query_terms" : 12
 		    }
