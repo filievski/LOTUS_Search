@@ -1,4 +1,4 @@
-# lodl_index
+# LOTUS Search
 API of the textual index to the LOD Laundromat
 
 
