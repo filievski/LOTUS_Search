@@ -7,9 +7,8 @@ var SparqlClient = require('sparql-client');
 
 var query_url = 'http://localhost:9200/laundrospot/_search';
 
-function lookup_simple(q, callback){
-	data={"query": { "match": { "string": q } } };
-//	data = {"query": { "match": { "lexform": {"query": q}}}};	
+function lookup_simple(q, size, callback){
+	data={"query": { "match": { "string": q } }, "size": size};
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
 		if (!error && response.statusCode == 200)
 		{
@@ -91,11 +90,22 @@ function query_anytime(word, func){
 }
 
 app.get('/', function(req, res){
-	res.send('hello world');
+    res.sendFile('index.html', {root:'./client'});
 });
 
+app.get('/main.js', function(req, res){
+    res.sendFile('main.js', {root:'./client'});
+});
+
+app.get('/teal-lotus.ico', function(req, res){
+    res.sendFile('teal-lotus.ico', {root:'./client'});
+});
+
+app.get('/teal-lotus.svg', function(req, res){
+    res.sendFile('teal-lotus.svg', {root:'./client'});
+});
 app.get('/candidates', function(req, res){
-	lookup_simple(req.param('query'), function(cands){
+	lookup_simple(req.param('query'), req.param('size') || 10, function(cands){
 		res.send(cands);
 	});
 });
