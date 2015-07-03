@@ -7,8 +7,12 @@ var SparqlClient = require('sparql-client');
 
 var query_url = 'http://localhost:9200/laundrospot/_search';
 
-function lookup_simple(q, size, callback){
-	data={"query": { "match": { "string": q } }, "size": size};
+function lookup_simple(q, size, langtag, callback){
+	if (langtag!="")
+        	var data={"query": { "match": {"string": q },"match": {"langtag": langtag } }, "size": size};
+	else
+		var data={"query": { "match": { "string": q } }, "size": size};
+	console.log(data);
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
 		if (!error && response.statusCode == 200)
 		{
@@ -105,7 +109,7 @@ app.get('/teal-lotus.svg', function(req, res){
     res.sendFile('teal-lotus.svg', {root:'./client'});
 });
 app.get('/candidates', function(req, res){
-	lookup_simple(req.param('query'), req.param('size') || 10, function(cands){
+	lookup_simple(req.param('query'), req.param('size') || 10, req.param('langtag') || "", function(cands){
 		res.send(cands);
 	});
 });

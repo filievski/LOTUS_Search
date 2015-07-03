@@ -12,6 +12,11 @@ pre.apiCall {
     margin-bottom: 1px;
 }
 
+a
+{
+    color: darkcyan !important;
+}
+
 </style>
 </head>
 
@@ -47,21 +52,21 @@ pre.apiCall {
 			<form class="form-search" onsubmit="initDt(this);return false;" apiType="r2d">
 				<div class="input-group">
 				<div class="col-md-6"><label>String:</label>
-				   <input type="text" class="form-control apiUri" id="r2dUri" placeholder="Grote Kerk">
+				   <input type="text" class="form-control apiUri" id="r2dUri" placeholder="De 9 straatjes">
 				</div> 
 				<div class="col-md-1"><label>Langtag:</label>
                                 <input type="text" class="form-control" id="langtag" placeholder="en">
 				</div>
 				<div class="col-md-3"><label>Show the first</label>
-				   <select class="selectpicker" data-style="btn-primary" id="recordsize" width="100%">
+				   <select class="selectpicker" id="recordsize" width="100%">
 					  <option value="5">5</option>
 					  <option value="10" selected>10</option>
 					  <option value="20">20</option>
 					  <option value="50">50</option>
 					</select> <label> records</label>
 				</div><div class="col-md-2"><Br>
-				   <span class="input-group-btn">
-				        <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-search"></span> Find</button>
+				   <span>
+				        <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span> Find</button>
 			           </span>
 				 </div>
 				</div>

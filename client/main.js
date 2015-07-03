@@ -141,9 +141,9 @@ $.get( uri, function( data ) {
 	if (!data["timed_out"]){ 
 		var hits = data["hits"]["hits"];
  		$("#stats").html("Took <strong>" + data["took"] + "</strong> ms for <strong>" + data["hits"]["total"] + "</strong> records.");
-		var h='<thead><th>String</th><th>Langtag</th><th>DocId</th><th>Score</th></thead><tbody>';
+		var h='<thead><th>String</th><th>Langtag</th><th>Info</th><th>Score</th></thead><tbody>';
 		for (var i=0; i<hits.length; i++){
-			h+="<tr><td>" + hits[i]["_source"]["string"] + "</td><td>" + hits[i]["_source"]["langtag"] + "</td><td>" + hits[i]["_source"]["docid"] + "</td><td>" + hits[i]["_score"] + "</td></tr>";
+			h+="<tr><td>" + hits[i]["_source"]["string"] + "</td><td>" + hits[i]["_source"]["langtag"] + "</td><td>DocId: " + hits[i]["_source"]["docid"] + ", <br/>Subject: " + hits[i]["_source"]["subject"] + ", <br/>Predicate: " + hits[i]["_source"]["predicate"] + "</td><td>" + hits[i]["_score"] + "</td></tr>";
 		}
 		h+="</tbody>";
 		oTable.html(h);
