@@ -25,7 +25,7 @@ def lookup_literal(literal, language):
 			dbpedia+=1.0
 		total+=1.0
 		if total<=20.0:
-			all_hits.append(hit["_source"])
+			all_hits.append(hit["_source"]["subject"])
 	try:
 		dbp_share=dbpedia*100.0/total
 	except:
