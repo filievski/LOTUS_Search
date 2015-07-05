@@ -11,7 +11,7 @@ import csv
 import json
 
 def lookup_literal(literal, language):
-	url="http://textindex.fii800.d2s.labs.vu.nl/candidates?" + urllib.urlencode({"query": literal, "size": 50})
+	url="http://textindex.fii800.d2s.labs.vu.nl/candidates?" + urllib.urlencode({"query": literal, "size": 100})
 	print url
 	raw_content = urllib2.urlopen(url).read()
 	content=json.loads(raw_content)
@@ -24,9 +24,10 @@ def lookup_literal(literal, language):
 		if "dbpedia.org/resource" in hit["_source"]["subject"]:
 			dbpedia+=1.0
 		total+=1.0
-		all_hits.append(hit["_source"]["string"])
+		if total<=20.0:
+			all_hits.append(hit["_source"])
 	try:
-		dbp_share=dbpedia/total
+		dbp_share=dbpedia*100.0/total
 	except:
 		dbp_share=None
 	print took
@@ -45,7 +46,7 @@ if __name__ == '__main__':
 		writepath=path + "/out." + file
 		with open(writepath, "wb") as writefile:	
 			spamwriter=csv.writer(writefile, delimiter=',', quotechar='"')
-			spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits", "DBpedia %", "Hits"])
+			spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits", "DBpedia % (in first 100)", "Hits"])
 			with open(fullpath, 'rb') as csvfile:
 				spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
 				for row in spamreader:
