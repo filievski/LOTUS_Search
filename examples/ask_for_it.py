@@ -11,13 +11,26 @@ import csv
 import json
 
 def lookup_literal(literal, language):
-	url="http://textindex.fii800.d2s.labs.vu.nl/candidates?" + urllib.urlencode({"query": literal})
+	url="http://textindex.fii800.d2s.labs.vu.nl/candidates?" + urllib.urlencode({"query": literal, "size": 50})
 	print url
 	raw_content = urllib2.urlopen(url).read()
 	content=json.loads(raw_content)
 	took=content["took"]
 	num_hits=content["hits"]["total"]
-	return took, num_hits
+	all_hits=[]
+	total=0.0
+	dbpedia=0.0
+	for hit in content["hits"]["hits"]:
+		if "dbpedia.org/resource" in hit["_source"]["subject"]:
+			dbpedia+=1.0
+		total+=1.0
+		all_hits.append(hit["_source"]["string"])
+	try:
+		dbp_share=dbpedia/total
+	except:
+		dbp_share=None
+	print took
+	return took, num_hits, dbp_share, all_hits
 
 if __name__ == '__main__':
 
@@ -32,12 +45,12 @@ if __name__ == '__main__':
 		writepath=path + "/out." + file
 		with open(writepath, "wb") as writefile:	
 			spamwriter=csv.writer(writefile, delimiter=',', quotechar='"')
-			spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits"])
+			spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits", "DBpedia %", "Hits"])
 			with open(fullpath, 'rb') as csvfile:
 				spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
 				for row in spamreader:
 					if path=="monuments":
-						time, num_hits=lookup_literal(row[0], "nl")
-						spamwriter.writerow([row[0], row[1], row[2], row[3], time, num_hits])
+						time, num_hits, dbp_share, all_hits = lookup_literal(row[0], "nl")
+						spamwriter.writerow([row[0], row[1], row[2], row[3], time, num_hits, dbp_share, all_hits])
 					else: # CONLL or COLD conferences
 						lookup_literal(row[0], "en")
