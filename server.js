@@ -7,9 +7,10 @@ var SparqlClient = require('sparql-client');
 
 var query_url = 'http://localhost:9200/laundrospot/_search';
 
-function lookup_simple(q, size, langtag, callback){
-	if (langtag!="")
-        	var data={"query": { "match": {"string": q },"match": {"langtag": langtag } }, "size": size};
+// Q1 and Q4
+function lookup_flexible(q, size, langtag, callback){
+	if (langtag)
+                var data={ "query": { "bool": { "must": { "match": { "string": q}}, "should": { "term": {"langtag": langtag }} }}, "size": size};
 	else
 		var data={"query": { "match": { "string": q } }, "size": size};
 	console.log(data);
@@ -24,25 +25,40 @@ function lookup_simple(q, size, langtag, callback){
 	});
 }
 
-function lookup_phrase(q, callback){
-        data={"query": {
-                "match_phrase": {
-                    "string": {
-                        "query" :       q,
-                        "slop" :     	3
-                    }
-                }
-            }};
+// Q2 and Q3
+function lookup_phrase(q, size, langtag, callback){
+	if (langtag)
+                var data={ "query": { "bool": { "must": { "match_phrase": { "string": q}}, "should": { "term": {"langtag": langtag }} }}};
+	else
+		var data={"query": { "match_phrase": { "string": q } }, "size": size};
+	console.log(data);
+	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+		if (!error && response.statusCode == 200)
+		{
+			console.log(body);
+			callback(body);
+		} else{
+			console.log("ERROR" + error);
+		}
+	});
+}
 
-        request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
-                if (!error && response.statusCode == 200)
-                {
-                        console.log(body);
-                        callback(body);
-                } else{
-                        console.log("ERROR" + error);
-                }
-        });
+/*
+function lookup_bool(q, size, langtag, callback){
+	if (langtag!="")
+        	var data={ "query": { "bool": { "must": { "match_phrase": { "string": q}}, "should": { "term": {"langtag": langtag }} }}};
+	else
+		var data={"query": { "match": { "string": q, "operator": "and" } }, "size": size};
+	console.log(data);
+	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+		if (!error && response.statusCode == 200)
+		{
+			console.log(body);
+			callback(body);
+		} else{
+			console.log("ERROR" + error);
+		}
+	});
 }
 
 function get_fuzzy_candidate_strings(q, callback){
@@ -65,6 +81,7 @@ function get_fuzzy_candidate_strings(q, callback){
                 }
         });
 }
+*/
 
 function get_identical_resources(q, callback){
 /*
@@ -108,17 +125,31 @@ app.get('/teal-lotus.ico', function(req, res){
 app.get('/teal-lotus.svg', function(req, res){
     res.sendFile('teal-lotus.svg', {root:'./client'});
 });
-app.get('/candidates', function(req, res){
-	lookup_simple(req.param('query'), req.param('size') || 10, req.param('langtag') || "", function(cands){
+
+app.get('/flexible', function(req, res){
+	lookup_flexible(req.param('query'), req.param('size') || 10, null, function(cands){
 		res.send(cands);
 	});
 });
 
 app.get('/phrase', function(req, res){
-	lookup_phrase(req.param('query'), function(cands){
+        lookup_phrase(req.param('query'), req.param('size') || 10, null, function(cands){
+                res.send(cands);
+        });
+});
+
+app.get('/langphrase', function(req, res){
+	lookup_phrase(req.param('query'), req.param('size') || 10, req.param('langtag') || "", function(cands){
 		res.send(cands);
 	});
 });
+
+app.get('/langflexible', function(req, res){
+        lookup_flexible(req.param('query'), req.param('size') || 10, req.param('langtag') || "", function(cands){
+                res.send(cands);
+        });
+});
+
 
 app.get('/fuzzycandidates', function(req, res){
         get_fuzzy_candidate_strings(req.param('query'), function(cands){

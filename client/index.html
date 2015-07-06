@@ -51,19 +51,27 @@ a
             <p>Find <a href="http://lodlaundromat.org" target="_blank">LOD Laundromat</a> statements where this string stands as (part of) the object</p>
 			<form class="form-search" onsubmit="initDt(this);return false;" apiType="r2d">
 				<div class="input-group">
-				<div class="col-md-6"><label>String:</label>
+				<div class="col-md-3"><label>String:</label>
 				   <input type="text" class="form-control apiUri" id="r2dUri" placeholder="De 9 straatjes">
 				</div> 
 				<div class="col-md-1"><label>Langtag:</label>
-                                <input type="text" class="form-control" id="langtag" placeholder="">
+                                <input type="text" class="form-control" id="langtag" disabled placeholder="">
 				</div>
-				<div class="col-md-3"><label>Show the first</label>
-				   <select class="selectpicker" id="recordsize" width="100%">
-					  <option value="5">5</option>
-					  <option value="10" selected>10</option>
-					  <option value="20">20</option>
-					  <option value="50">50</option>
-					</select> <label> records</label>
+                                <div class="col-md-3"><label>Show the first</label>
+                                   <select class="selectpicker" id="recordsize" width="100%">
+                                          <option value="5">5</option>
+                                          <option value="10" selected>10</option>
+                                          <option value="20">20</option>
+                                          <option value="50">50</option>
+                                        </select> <label> records</label>
+                                </div>
+				<div class="col-md-3"><label>Query type:</label>
+				   <select class="selectpicker" id="querytype" width="100%">
+					  <option value="flexible">flexible</option>
+					  <option value="phrase" selected>phrase</option>
+					  <option value="langphrase">langphrase</option>
+					  <option value="langflexible">langflexible</option>
+					</select>
 				</div><div class="col-md-2"><Br>
 				   <span>
 				        <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span> Find</button>
@@ -72,8 +80,8 @@ a
 				</div>
 
 			 </form>
-			 <pre class="apiCall" id="r2dApiCall" preFor="r2dUri langtag recordsize" apiType='r2d'></pre>
-			<label>This is a demo. It might take a while...</label>
+			 <pre class="apiCall" id="r2dApiCall" preFor="r2dUri langtag recordsize querytype" apiType='r2d'></pre>
+			<label>This is a demo. Response might take a while...</label>
 		<div id="stats"></div>
 	       <table id="jsontable" class="table table-striped " cellspacing="0" width="100%">
 	            <thead>
