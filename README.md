@@ -1,14 +1,13 @@
-# lodl_index
-API of the textual index to the LOD Laundromat
+# 
+API and website of LOTUS: extual index to the LOD Laundromat
 
 
 #Example calls:
 Candidates:
-http://textindex.fii800.d2s.labs.vu.nl/candidates?query=Open%20%Season
-
-Fuzzy candidates:
-http://textindex.fii800.d2s.labs.vu.nl/fuzzycandidates?query=Open%20%Season
+http://lotus.lodlaundromat.org/candidates?query=De%209%20straatjes&size=10
 
 
+
+#Future work:
 (Directly linked) Identical resources:
 http://textindex.fii800.eculture.labs.vu.nl/identical?query=http://dbpedia.org/resource/Airbus
