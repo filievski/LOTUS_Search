@@ -55,7 +55,7 @@ a
 				   <input type="text" class="form-control apiUri" id="r2dUri" placeholder="De 9 straatjes">
 				</div> 
 				<div class="col-md-1"><label>Langtag:</label>
-                                <input type="text" class="form-control" id="langtag" placeholder="en">
+                                <input type="text" class="form-control" id="langtag" placeholder="">
 				</div>
 				<div class="col-md-3"><label>Show the first</label>
 				   <select class="selectpicker" id="recordsize" width="100%">
@@ -72,8 +72,8 @@ a
 				</div>
 
 			 </form>
-			 <pre class="apiCall" id="r2dApiCall" preFor="r2dUri" apiType='r2d'></pre>
-
+			 <pre class="apiCall" id="r2dApiCall" preFor="r2dUri langtag recordsize" apiType='r2d'></pre>
+			<label>This is a demo. It might take a while...</label>
 		<div id="stats"></div>
 	       <table id="jsontable" class="table table-striped " cellspacing="0" width="100%">
 	            <thead>

@@ -131,11 +131,15 @@ var destroy = function(type) {
 }
 
 var initDt = function(formEl) {
+    $('input[placeholder]')
+	.each(function(){ensureInputValue($(this))})
+    	//trigger keyup so pre gets updated
+	.trigger('keyup');
     formEl = $(formEl);
     var type = formEl.attr('apiType');
     destroy(type);
     var oTable = $('#jsontable');
-    var uri = "http://lotus.fii800.d2s.labs.vu.nl/candidates?query=" + encodeURIComponent(formEl.find('.apiUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
+    var uri = "/candidates?query=" + encodeURIComponent(formEl.find('.apiUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
 
 $.get( uri, function( data ) {
 	if (!data["timed_out"]){ 
@@ -156,9 +160,8 @@ function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-var getUriString = function(type, url) {
-    if (!url) url = '';
-    return 'http://lotus.fii800.d2s.labs.vu.nl/candidates?query=' + encodeURIComponent(url) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
+var getUriString = function() {
+    return '/candidates?query=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
 }
 var ensureInputValue = function(el) {
     if (el.val().length > 0) {
@@ -182,11 +185,18 @@ var handleEvents = function() {
     });
     $('pre[preFor]').each(function(i, el) {
         var el = $(el);
-        $('#' + el.attr('preFor')).keyup(function() {
-            el.text(getUriString(el.attr('apiType'), $(this).val()))
-        });
+	var preFor = el.attr('preFor');
+	var preFors = preFor.split(' ');
+	preFors.forEach(function(preId) {
+		$('#' + preId).keyup(function() {
+           		el.text(getUriString());
+        	});
+		$('#' + preId).change(function() {
+			el.text(getUriString());
+		});
+	});
         //initialize
-        el.text(getUriString(el.attr('apiType')));
+        el.text(getUriString());
     })
     
     
