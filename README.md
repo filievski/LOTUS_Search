@@ -1,5 +1,5 @@
-# 
-API and website of LOTUS: extual index to the LOD Laundromat
+# LOTUS: Linked Open Text Unleashed
+API and website of LOTUS, full-text index to the LOD Laundromat
 
 
 #Example calls:
