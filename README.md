@@ -19,7 +19,4 @@ http://lotus.lodlaundromat.org/langphrase?query=De%209%20straatjes&size=10&langt
 
 Also, try our website at http://lotus.lodlaundromat.org/ 
 
-#Future work:
-(Directly linked) Identical resources:
-http://textindex.fii800.eculture.labs.vu.nl/identical?query=http://dbpedia.org/resource/Airbus
 
