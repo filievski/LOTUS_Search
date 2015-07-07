@@ -30,12 +30,8 @@ def lookup_literal(qtype, literal, language):
 		total_total+=1.0
 		if total<=20.0:
 			all_hits.append(hit["_source"]["subject"])
-	try:
-		dbp_share=dbpedia*100.0/total
-	except:
-		dbp_share=None
 	total_took+=took
-	return took, num_hits, dbp_share, all_hits
+	return took, num_hits, dbpedia, total, all_hits
 
 total_dbpedia=0.0
 total_total=0.0
@@ -58,14 +54,14 @@ if __name__ == '__main__':
 					writepath=path + "/out/" + qtype + "." + file
 					with open(writepath, "wb") as writefile:	
 						spamwriter=csv.writer(writefile, delimiter=',', quotechar='"')
-						spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits", "DBpedia % (in first 100)", "Hits"])
+						spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits", "DBpedia in first 100", "100 or less", "Hits"])
 						for row in spamreader:
 							if path=="monuments":
-								time, num_hits, dbp_share, all_hits = lookup_literal(qtype, row[0], "nl")
-								spamwriter.writerow([row[0], row[1], row[2], row[3], time, num_hits, dbp_share, all_hits])
+								time, num_hits, dbp, total, all_hits = lookup_literal(qtype, row[0], "nl")
+								spamwriter.writerow([row[0], row[1], row[2], row[3], time, num_hits, dbp, total, all_hits])
 							elif path=="aida": # CONLL or COLD conferences
 								time, num_hits, dbp_share, all_hits = lookup_literal(qtype, row[0], "en")
-								spamwriter.writerow([row[0], row[1], time, num_hits, dbp_share, all_hits])
+								spamwriter.writerow([row[0], row[1], time, num_hits, dbp, total, all_hits])
 					print qtype, total_dbpedia, total_total, total_took
 					total_dbpedia=0.0
 					total_total=0.0
