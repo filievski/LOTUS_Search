@@ -56,9 +56,10 @@ if __name__ == '__main__':
 
 	path=sys.argv[1]
 
+
 	for file in os.listdir(path):
 		if file.endswith(".csv"):
-			for qtype in ["flexible", "langflexible", "phrase", "langphrase"]:
+			for qtype in ["flexible", "phrase"]:
 				readpath=path + "/" + file
 				with open(readpath, 'rb') as csvfile:
 					spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -68,22 +69,24 @@ if __name__ == '__main__':
 						spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits", "DBpedia in first 100", "100 or less", "Hits"])
 					        hname="monuments/html/" + qtype + "." + file + ".html"
 					        h="<html><head>" + hname + "</head><body>"
-
+						
 						for row in spamreader:
+							time, num_hits, dbp, total, all_hits = lookup_literal(qtype, row[0], "en")
+							try:
+								h+="<br/>" + iriToUri(row[0]) + " : "
+								c=0
+								for res in all_hits:
+									c+=1
+									h+=" <a href='" + iriToUri(res) + "'>Link" + str(c) + "</a>"
+							except:
+								print "Error"
+
 							if path=="monuments":
-								time, num_hits, dbp, total, all_hits = lookup_literal(qtype, row[0], "nl")
 								spamwriter.writerow([row[0], row[1], row[2], row[3], time, num_hits, dbp, total, all_hits])
-								try:
-									h+="<br/>" + iriToUri(row[0]) + " : "
-									c=0
-									for res in all_hits:
-										c+=1
-										h+=" <a href='" + iriToUri(res) + "'>Link" + str(c) + "</a>"
-								except:
-									print "Error"
 							elif path=="aida": # CONLL or COLD conferences
-								time, num_hits, dbp_share, all_hits = lookup_literal(qtype, row[0], "en")
 								spamwriter.writerow([row[0], row[1], time, num_hits, dbp, total, all_hits])
+							else:#journals
+								spamwriter.writerow([row[0], row[1], row[2], row[3], row[4], row[5], time, num_hits, dbp, total, all_hits])
 						h+="</body></html>"
 						w=open(hname, "w")
 						w.write(h)
