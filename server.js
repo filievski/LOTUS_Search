@@ -28,7 +28,7 @@ function lookup_flexible(q, size, langtag, callback){
 // Q2 and Q3
 function lookup_phrase(q, size, langtag, callback){
 	if (langtag)
-                var data={ "query": { "bool": { "must": { "match_phrase": { "string": q}}, "should": { "term": {"langtag": langtag }} }}};
+                var data={ "query": { "bool": { "must": { "match_phrase": { "string": q}}, "should": { "term": {"langtag": langtag }} }}, "size": size};
 	else
 		var data={"query": { "match_phrase": { "string": q } }, "size": size};
 	console.log(data);
