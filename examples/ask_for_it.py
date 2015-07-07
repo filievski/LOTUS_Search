@@ -3,12 +3,23 @@ Created on Jun 27, 2015
 @author: Filip Ilievski
 '''
 
+import re, urlparse
 import sys
 import os
 import urllib
 import urllib2
 import csv
 import json
+
+def urlEncodeNonAscii(b):
+    return re.sub('[\x80-\xFF]', lambda c: '%%%02x' % ord(c.group(0)), b)
+
+def iriToUri(iri):
+    parts= urlparse.urlparse(iri)
+    return urlparse.urlunparse(
+        part.encode('idna') if parti==1 else urlEncodeNonAscii(part.encode('utf-8'))
+        for parti, part in enumerate(parts)
+    )
 
 def lookup_literal(qtype, literal, language):
 	url="http://lotus.lodlaundromat.org/" + qtype + "?" + urllib.urlencode({"query": literal, "langtag": language, "size": 100})
@@ -55,14 +66,33 @@ if __name__ == '__main__':
 					with open(writepath, "wb") as writefile:	
 						spamwriter=csv.writer(writefile, delimiter=',', quotechar='"')
 						spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits", "DBpedia in first 100", "100 or less", "Hits"])
+					        hname="monuments/html/" + qtype + "." + file + ".html"
+					        h="<html><head>" + hname + "</head><body>"
+
 						for row in spamreader:
 							if path=="monuments":
 								time, num_hits, dbp, total, all_hits = lookup_literal(qtype, row[0], "nl")
 								spamwriter.writerow([row[0], row[1], row[2], row[3], time, num_hits, dbp, total, all_hits])
+								try:
+									h+="<br/>" + iriToUri(row[0]) + " : "
+									c=0
+									for res in all_hits:
+										c+=1
+										h+=" <a href='" + iriToUri(res) + "'>Link" + str(c) + "</a>"
+								except:
+									print "Error"
 							elif path=="aida": # CONLL or COLD conferences
 								time, num_hits, dbp_share, all_hits = lookup_literal(qtype, row[0], "en")
 								spamwriter.writerow([row[0], row[1], time, num_hits, dbp, total, all_hits])
+						h+="</body></html>"
+						w=open(hname, "w")
+						w.write(h)
+						w.close()
 					print qtype, total_dbpedia, total_total, total_took
 					total_dbpedia=0.0
 					total_total=0.0
 					total_took=0.0
+
+
+
+        

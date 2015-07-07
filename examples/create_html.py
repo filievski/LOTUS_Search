@@ -8,11 +8,11 @@ for file in os.listdir(path):
 	with open(readpath, 'rb') as csvfile:
 		spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
 		for row in spamreader:
-			print row[-1]
 			try:
 				ent_array=json.loads(row[-1])
 			except:
 				continue
+			print "Hello"
 			ent_string=row[0]
 			
 			h+="<br/>" + ent_string + " : "
