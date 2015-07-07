@@ -51,25 +51,22 @@ if __name__ == '__main__':
 
 	for file in os.listdir(path):
 		if file.endswith(".csv"):
-			readpath=path + "/" + file
-			with open(readpath, 'rb') as csvfile:
-				spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-				for qtype in ["phrase", "langphrase", "flexible", "langflexible"]:
-					writepath=path + "/out." + qtype + "/" + file
+			for qtype in ["flexible", "langflexible", "phrase", "langphrase"]:
+				readpath=path + "/" + file
+				with open(readpath, 'rb') as csvfile:
+					spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+					writepath=path + "/out/" + qtype + "." + file
 					with open(writepath, "wb") as writefile:	
 						spamwriter=csv.writer(writefile, delimiter=',', quotechar='"')
 						spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits", "DBpedia % (in first 100)", "Hits"])
-							for row in spamreader:
-								if path=="monuments":
-									time, num_hits, dbp_share, all_hits = lookup_literal(row[0], "nl")
-									spamwriter.writerow([row[0], row[1], row[2], row[3], time, num_hits, dbp_share, all_hits])
-								elif path=="aida": # CONLL or COLD conferences
-									time, num_hits, dbp_share, all_hits = lookup_literal(row[0], "en")
-									spamwriter.writerow([row[0], row[1], time, num_hits, dbp_share, all_hits])
+						for row in spamreader:
+							if path=="monuments":
+								time, num_hits, dbp_share, all_hits = lookup_literal(qtype, row[0], "nl")
+								spamwriter.writerow([row[0], row[1], row[2], row[3], time, num_hits, dbp_share, all_hits])
+							elif path=="aida": # CONLL or COLD conferences
+								time, num_hits, dbp_share, all_hits = lookup_literal(qtype, row[0], "en")
+								spamwriter.writerow([row[0], row[1], time, num_hits, dbp_share, all_hits])
 					print qtype, total_dbpedia, total_total, total_took
-					global total_dbpedia
-					global total_total
-					global total_took
 					total_dbpedia=0.0
 					total_total=0.0
 					total_took=0.0
