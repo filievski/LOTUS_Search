@@ -67,7 +67,7 @@ if __name__ == '__main__':
 					with open(writepath, "wb") as writefile:	
 						spamwriter=csv.writer(writefile, delimiter=',', quotechar='"')
 						spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits", "DBpedia in first 100", "100 or less", "Hits"])
-					        hname="monuments/html/" + qtype + "." + file + ".html"
+					        hname=path + "/html/" + qtype + "." + file + ".html"
 					        h="<html><head>" + hname + "</head><body>"
 						
 						for row in spamreader:
