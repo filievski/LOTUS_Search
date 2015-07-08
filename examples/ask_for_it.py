@@ -59,14 +59,14 @@ if __name__ == '__main__':
 
 	for file in os.listdir(path):
 		if file.endswith(".csv"):
-			for qtype in ["flexible", "phrase"]:
+			for qtype in ["flexible", "langflexible", "phrase", "langphrase"]:
 				readpath=path + "/" + file
 				with open(readpath, 'rb') as csvfile:
 					spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
 					writepath=path + "/out/" + qtype + "." + file
 					with open(writepath, "wb") as writefile:	
 						spamwriter=csv.writer(writefile, delimiter=',', quotechar='"')
-						spamwriter.writerow(["Literal", "Source", "Part of the text", "Entity type", "ES Time elapsed", "# ES Hits", "DBpedia in first 100", "100 or less", "Hits"])
+						spamwriter.writerow(["Literal", "Source", "ES Time elapsed", "# ES Hits", "DBpedia in first 100", "100 or less", "Hits"])
 					        hname=path + "/html/" + qtype + "." + file + ".html"
 					        h="<html><head>" + hname + "</head><body>"
 						
