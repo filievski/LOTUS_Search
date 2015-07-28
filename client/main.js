@@ -140,10 +140,10 @@ var initDt = function(formEl) {
     destroy(type);
     var oTable = $('#jsontable');
 
-    if ($('#querytype').val()=="langflexible" || $('#querytype').val()=="langphrase")
-        var uri = '/' + $("#querytype").val() + '?query=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
+    if ($('#querytype').val()=="langterms" || $('#querytype').val()=="langphrase")
+        var uri = '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
     else        
-	var uri = '/' + $("#querytype").val() + '?query=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val();
+	var uri = '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val();
 
 $.get( uri, function( data ) {
 	if (!data["timed_out"]){ 
@@ -165,10 +165,10 @@ function numberWithCommas(x) {
 }
 
 var getUriString = function() {
-    if ($('#querytype').val()=="langflexible" || $('#querytype').val()=="langphrase")
-    	return '/' + $("#querytype").val() + '?query=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
+    if ($('#querytype').val()=="langterms" || $('#querytype').val()=="langphrase")
+    	return '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
     else
-	return '/' + $("#querytype").val() + '?query=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val();
+	return '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val();
 }
 var ensureInputValue = function(el) {
     if (el.val().length > 0) {
@@ -207,7 +207,7 @@ var handleEvents = function() {
     })
     
     $('#querytype').change(function() {
-	if ($('#querytype').val()=="langflexible" || $('#querytype').val()=="langphrase")
+	if ($('#querytype').val()=="langterms" || $('#querytype').val()=="langphrase")
 		$("#langtag").prop('disabled', false);
 	else
 		$("#langtag").prop('disabled', true);

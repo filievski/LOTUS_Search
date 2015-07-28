@@ -8,7 +8,7 @@ var SparqlClient = require('sparql-client');
 var query_url = 'http://localhost:9200/laundrospot/_search';
 
 // Q1 and Q4
-function lookup_flexible(q, size, langtag, callback){
+function lookup_terms(q, size, langtag, callback){
 	if (langtag)
                 var data={ "query": { "bool": { "must": { "match": { "string": q}}, "should": { "term": {"langtag": langtag }} }}, "size": size};
 	else
@@ -41,6 +41,28 @@ function lookup_phrase(q, size, langtag, callback){
 			console.log("ERROR" + error);
 		}
 	});
+}
+
+// Q5
+function conjunct_terms(q, size, callback){
+	
+	var data = {"query": {"common": {"string": {"query": q, "cutoff_frequency": 0.001, "low_freq_operator": "and"}}}};
+
+//        if (langtag)
+//                var data={ "query": { "bool": { "must": { "match_phrase": { "string": q}}, "should": { "term": {"langtag": langtag }} }}, "size": size};
+//        else
+//                var data={"query": { "match_phrase": { "string": q } }, "size": size};
+
+        console.log(data);
+        request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+                if (!error && response.statusCode == 200)
+                {
+                        console.log(body);
+                        callback(body);
+                } else{
+                        console.log("ERROR: " + error + ", response code: " + response.statusCode);
+                }
+        });
 }
 
 /*
@@ -126,30 +148,35 @@ app.get('/teal-lotus.svg', function(req, res){
     res.sendFile('teal-lotus.svg', {root:'./client'});
 });
 
-app.get('/flexible', function(req, res){
-	lookup_flexible(req.param('query'), req.param('size') || 10, null, function(cands){
+app.get('/terms', function(req, res){
+	lookup_terms(req.param('pattern'), req.param('size') || 10, null, function(cands){
 		res.send(cands);
 	});
 });
 
 app.get('/phrase', function(req, res){
-        lookup_phrase(req.param('query'), req.param('size') || 10, null, function(cands){
+        lookup_phrase(req.param('pattern'), req.param('size') || 10, null, function(cands){
                 res.send(cands);
         });
 });
 
 app.get('/langphrase', function(req, res){
-	lookup_phrase(req.param('query'), req.param('size') || 10, req.param('langtag') || "", function(cands){
+	lookup_phrase(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(cands){
 		res.send(cands);
 	});
 });
 
-app.get('/langflexible', function(req, res){
-        lookup_flexible(req.param('query'), req.param('size') || 10, req.param('langtag') || "", function(cands){
+app.get('/langterms', function(req, res){
+        lookup_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(cands){
                 res.send(cands);
         });
 });
 
+app.get('/conjunct', function(req, res){
+        conjunct_terms(req.param('pattern'), req.param('size') || 10, function(cands){
+                res.send(cands);
+        });
+});
 
 app.get('/fuzzycandidates', function(req, res){
         get_fuzzy_candidate_strings(req.param('query'), function(cands){

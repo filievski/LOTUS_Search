@@ -22,7 +22,7 @@ def iriToUri(iri):
     )
 
 def lookup_literal(qtype, literal, language):
-	url="http://lotus.lodlaundromat.org/" + qtype + "?" + urllib.urlencode({"query": literal, "langtag": language, "size": 100})
+	url="http://lotus.lodlaundromat.org/" + qtype + "?" + urllib.urlencode({"pattern": literal, "langtag": language, "size": 100})
 	raw_content = urllib2.urlopen(url).read()
 	content=json.loads(raw_content)
 	took=content["took"]
@@ -59,14 +59,14 @@ if __name__ == '__main__':
 
 	for file in os.listdir(path):
 		if file.endswith(".csv"):
-			for qtype in ["flexible", "langflexible", "phrase", "langphrase"]:
+			for qtype in ["terms", "langterms", "phrase", "langphrase"]:
 				readpath=path + "/" + file
 				with open(readpath, 'rb') as csvfile:
 					spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
 					writepath=path + "/out/" + qtype + "." + file
 					with open(writepath, "wb") as writefile:	
 						spamwriter=csv.writer(writefile, delimiter=',', quotechar='"')
-						spamwriter.writerow(["Literal", "Source", "ES Time elapsed", "# ES Hits", "DBpedia in first 100", "100 or less", "Hits"])
+						spamwriter.writerow(["Literal", "ES Time elapsed", "# ES Hits", "DBpedia in first 100", "100 or less", "Hits"])
 					        hname=path + "/html/" + qtype + "." + file + ".html"
 					        h="<html><head>" + hname + "</head><body>"
 						
@@ -84,7 +84,7 @@ if __name__ == '__main__':
 							if path=="monuments":
 								spamwriter.writerow([row[0], row[1], row[2], row[3], time, num_hits, dbp, total, all_hits])
 							elif path=="aida": # CONLL or COLD conferences
-								spamwriter.writerow([row[0], row[1], time, num_hits, dbp, total, all_hits])
+								spamwriter.writerow([row[0], time, num_hits, dbp, total, all_hits])
 							else:#journals
 								spamwriter.writerow([row[0], row[1], row[2], row[3], row[4], row[5], time, num_hits, dbp, total, all_hits])
 						h+="</body></html>"
