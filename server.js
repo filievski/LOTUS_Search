@@ -46,7 +46,7 @@ function lookup_phrase(q, size, langtag, callback){
 // Q5
 function conjunct_terms(q, size, callback){
 	
-	var data = {"query": {"common": {"string": {"query": q, "cutoff_frequency": 0.001, "low_freq_operator": "and"}}}};
+	var data = {"query": {"common": {"string": {"query": q, "cutoff_frequency": 0.001, "low_freq_operator": "and"}}}, "size": size};
 
 //        if (langtag)
 //                var data={ "query": { "bool": { "must": { "match_phrase": { "string": q}}, "should": { "term": {"langtag": langtag }} }}, "size": size};
