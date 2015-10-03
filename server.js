@@ -5,7 +5,7 @@ var async = require('async');
 var request = require('request');
 var SparqlClient = require('sparql-client');
 
-var query_url = 'http://localhost:9200/laundrospot/_search';
+var query_url = 'http://localhost:9200/lotus/_search';
 
 // Q1 and Q4
 function lookup_terms(q, size, langtag, callback){
@@ -17,10 +17,13 @@ function lookup_terms(q, size, langtag, callback){
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
 		if (!error && response.statusCode == 200)
 		{
-			console.log(body);
-			callback(body);
+			console.log(body["hits"]["hits"]);
+			callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
+				o["_source"]["triple"]["docid"]=o["_source"]["docid"];
+				return o["_source"]["triple"];
+			}));
 		} else{
-			console.log("ERROR" + error);
+                        console.log("ERROR" + error);
 		}
 	});
 }
@@ -30,15 +33,19 @@ function lookup_phrase(q, size, langtag, callback){
 	if (langtag)
                 var data={ "query": { "bool": { "must": { "match_phrase": { "string": q}}, "should": { "term": {"langtag": langtag }} }}, "size": size};
 	else
-		var data={"query": { "match_phrase": { "string": q } }, "size": size};
+		var data={"query": { "match_phrase": { "string": q}}, "size": size};
 	console.log(data);
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
 		if (!error && response.statusCode == 200)
 		{
-			console.log(body);
-			callback(body);
+			console.log(body["hits"]["hits"]);
+                        callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
+                                o["_source"]["triple"]["docid"]=o["_source"]["docid"];
+                                return o["_source"]["triple"];
+			}));
 		} else{
 			console.log("ERROR" + error);
+			console.log(response.statusCode);
 		}
 	});
 }
@@ -57,10 +64,32 @@ function conjunct_terms(q, size, callback){
         request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
                 if (!error && response.statusCode == 200)
                 {
-                        console.log(body);
+                        console.log(body["hits"]["hits"]);
+                        callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
+                                o["_source"]["triple"]["docid"]=o["_source"]["docid"];
+                                return o["_source"]["triple"];
+                        }));
+                } else{
+                        console.log("ERROR: " + error);
+                }
+        });
+}
+
+// Q6
+function lookup_fuzzy_terms(q, size, callback){
+	var fuzziness_level = 1;
+        var data={"query": { "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and" } } }, "size": size};
+        console.log(data);
+        request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+                if (!error && response.statusCode == 200)
+                {
+                        callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
+                                o["_source"]["triple"]["docid"]=o["_source"]["docid"];
+                                return o["_source"]["triple"];
+                        }));
                         callback(body);
                 } else{
-                        console.log("ERROR: " + error + ", response code: " + response.statusCode);
+                        console.log("ERROR: " + error);
                 }
         });
 }
@@ -148,33 +177,43 @@ app.get('/teal-lotus.svg', function(req, res){
     res.sendFile('teal-lotus.svg', {root:'./client'});
 });
 
+app.get('/cssload.css', function(req, res){
+    res.sendFile('cssload.css', {root:'./client'});
+});
+
 app.get('/terms', function(req, res){
-	lookup_terms(req.param('pattern'), req.param('size') || 10, null, function(cands){
-		res.send(cands);
+	lookup_terms(req.param('pattern'), req.param('size') || 10, null, function(took, hits, cands){
+                res.send({"took": took, "numhits": hits, "hits": cands});
 	});
 });
 
 app.get('/phrase', function(req, res){
-        lookup_phrase(req.param('pattern'), req.param('size') || 10, null, function(cands){
-                res.send(cands);
+        lookup_phrase(req.param('pattern'), req.param('size') || 10, null, function(took, hits, cands){
+                res.send({"took": took, "numhits": hits, "hits": cands});
         });
 });
 
 app.get('/langphrase', function(req, res){
-	lookup_phrase(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(cands){
-		res.send(cands);
+	lookup_phrase(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
+                res.send({"took": took, "numhits": hits, "hits": cands});
 	});
 });
 
 app.get('/langterms', function(req, res){
-        lookup_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(cands){
-                res.send(cands);
+        lookup_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
+                res.send({"took": took, "numhits": hits, "hits": cands});
         });
 });
 
 app.get('/conjunct', function(req, res){
-        conjunct_terms(req.param('pattern'), req.param('size') || 10, function(cands){
-                res.send(cands);
+        conjunct_terms(req.param('pattern'), req.param('size') || 10, function(took, hits, cands){
+                res.send({"took": took, "numhits": hits, "hits": cands});
+        });
+});
+
+app.get('/fuzzyterms', function(req, res){
+        lookup_fuzzy_terms(req.param('pattern'), req.param('size') || 10, function(took, hits, cands){
+                res.send({"took": took, "numhits": hits, "hits": cands});
         });
 });
 

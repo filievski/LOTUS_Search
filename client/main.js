@@ -139,24 +139,27 @@ var initDt = function(formEl) {
     var type = formEl.attr('apiType');
     destroy(type);
     var oTable = $('#jsontable');
+    oTable.hide();
 
     if ($('#querytype').val()=="langterms" || $('#querytype').val()=="langphrase")
         var uri = '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
     else        
 	var uri = '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val();
 
-$.get( uri, function( data ) {
-	if (!data["timed_out"]){ 
-		var hits = data["hits"]["hits"];
- 		$("#stats").html("Took <strong>" + data["took"] + "</strong> ms for <strong>" + data["hits"]["total"] + "</strong> records.");
-		var h='<thead><th>String</th><th>Langtag</th><th>Info</th><th>Score</th></thead><tbody>';
+		$("#circularG").show();
+$.get( uri, function( hitsdata ) {
+		var hits=hitsdata["hits"];
+ 		//$("#stats").html("Took <strong>" + data["took"] + "</strong> ms for <strong>" + data["hits"]["total"] + "</strong> records.");
+		var h='<thead><th>Results</th><th></th></thead><tbody>';
+		$("#circularG").hide();
+ 		$("#stats").html("Took <strong>" + hitsdata["took"] + "</strong> ms for <strong>" + hitsdata["numhits"] + "</strong> records.");
 		for (var i=0; i<hits.length; i++){
-			h+="<tr><td>" + hits[i]["_source"]["string"] + "</td><td>" + hits[i]["_source"]["langtag"] + "</td><td>DocId: " + hits[i]["_source"]["docid"] + ", <br/>Subject: " + hits[i]["_source"]["subject"] + ", <br/>Predicate: " + hits[i]["_source"]["predicate"] + "</td><td>" + hits[i]["_score"] + "</td></tr>";
+			h+="<tr><td>&lt;" + hits[i]["subject"] + "&gt;<br/>&lt;" + hits[i]["predicate"] + "&gt;<br/>" + hits[i]["object"] + "</td><td><a role=\"button\" class=\"btn btn-default\" href=\"http://ldf.lodlaundromat.org/" + hits[i]["docid"] + "\" target=\"_blank\">Show document</a><br/><br/><a role=\"button\" class=\"btn btn-default\" href=\"http://lodlaundromat.org/resource/" + hits[i]["docid"] + "\" target=\"_blank\">Show metadata</a></td></tr>";
 		}
 		h+="</tbody>";
 		oTable.html(h);
-		console.log(data);
-	}
+		oTable.show();
+		console.log(hits);
     });
 }
 
