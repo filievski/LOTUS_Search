@@ -141,10 +141,7 @@ var initDt = function(formEl) {
     var oTable = $('#jsontable');
     oTable.hide();
 
-    if ($('#querytype').val()=="langterms" || $('#querytype').val()=="langphrase")
         var uri = '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
-    else        
-	var uri = '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val();
 
 		$("#circularG").show();
 $.get( uri, function( hitsdata ) {
@@ -168,10 +165,7 @@ function numberWithCommas(x) {
 }
 
 var getUriString = function() {
-    if ($('#querytype').val()=="langterms" || $('#querytype').val()=="langphrase")
     	return '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
-    else
-	return '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val();
 }
 var ensureInputValue = function(el) {
     if (el.val().length > 0) {
@@ -209,13 +203,6 @@ var handleEvents = function() {
         el.text(getUriString());
     })
     
-    $('#querytype').change(function() {
-	if ($('#querytype').val()=="langterms" || $('#querytype').val()=="langphrase")
-		$("#langtag").prop('disabled', false);
-	else
-		$("#langtag").prop('disabled', true);
-    });
- 
 }
 
 $(document).ready(function() {

@@ -10,7 +10,7 @@ var query_url = 'http://localhost:9200/lotus/_search';
 // Q1 and Q4
 function lookup_terms(q, size, langtag, callback){
 	if (langtag)
-                var data={ "query": { "bool": { "must": { "match": { "string": q}}, "should": { "term": {"langtag": langtag }} }}, "size": size};
+                var data={ "query": { "bool": { "must": [{ "match": { "string": q}}, { "term": {"langtag": langtag }}] }}, "size": size};
 	else
 		var data={"query": { "match": { "string": q } }, "size": size};
 	console.log(data);
@@ -32,7 +32,7 @@ function lookup_terms(q, size, langtag, callback){
 // Q2 and Q3
 function lookup_phrase(q, size, langtag, callback){
 	if (langtag)
-                var data={ "query": { "bool": { "must": { "match_phrase": { "string": q}}, "should": { "term": {"langtag": langtag }} }}, "size": size};
+                var data={ "query": { "bool": { "must": [{ "match_phrase": { "string": q}}, { "term": {"langtag": langtag }}] }}, "size": size};
 	else
 		var data={"query": { "match_phrase": { "string": q}}, "size": size};
 	console.log(data);
@@ -77,9 +77,12 @@ function conjunct_terms(q, size, langtag, callback){
 }
 
 // Q6
-function lookup_fuzzy_terms(q, size, callback){
+function lookup_fuzzy_terms(q, size, langtag, callback){
 	var fuzziness_level = 1;
-        var data={"query": { "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and" } } }, "size": size};
+	if (langtag)
+        	var data={"query": {"bool": { "must": [{ "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and" } } }, { "term": {"langtag": langtag}}]}}, "size": size};
+	else
+        	var data={"query": { "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and" } } }, "size": size};
         console.log(data);
         request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
                 if (!error && response.statusCode == 200)
@@ -183,25 +186,13 @@ app.get('/cssload.css', function(req, res){
     res.sendFile('cssload.css', {root:'./client'});
 });
 
-app.get('/terms', function(req, res){
-	lookup_terms(req.param('pattern'), req.param('size') || 10, null, function(took, hits, cands){
-                res.send({"took": took, "numhits": hits, "hits": cands});
-	});
-});
-
 app.get('/phrase', function(req, res){
-        lookup_phrase(req.param('pattern'), req.param('size') || 10, null, function(took, hits, cands){
-                res.send({"took": took, "numhits": hits, "hits": cands});
-        });
-});
-
-app.get('/langphrase', function(req, res){
 	lookup_phrase(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
                 res.send({"took": took, "numhits": hits, "hits": cands});
 	});
 });
 
-app.get('/langterms', function(req, res){
+app.get('/terms', function(req, res){
         lookup_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
                 res.send({"took": took, "numhits": hits, "hits": cands});
         });
@@ -214,7 +205,7 @@ app.get('/conjunct', function(req, res){
 });
 
 app.get('/fuzzyterms', function(req, res){
-        lookup_fuzzy_terms(req.param('pattern'), req.param('size') || 10, function(took, hits, cands){
+        lookup_fuzzy_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
                 res.send({"took": took, "numhits": hits, "hits": cands});
         });
 });
