@@ -20,6 +20,7 @@ function lookup_terms(q, size, langtag, callback){
 			console.log(body["hits"]["hits"]);
 			callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
 				o["_source"]["triple"]["docid"]=o["_source"]["docid"];
+				o["_source"]["triple"]["score"]=o["_score"];
 				return o["_source"]["triple"];
 			}));
 		} else{
@@ -41,6 +42,7 @@ function lookup_phrase(q, size, langtag, callback){
 			console.log(body["hits"]["hits"]);
                         callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
                                 o["_source"]["triple"]["docid"]=o["_source"]["docid"];
+                                o["_source"]["triple"]["score"]=o["_score"];
                                 return o["_source"]["triple"];
 			}));
 		} else{
@@ -51,15 +53,13 @@ function lookup_phrase(q, size, langtag, callback){
 }
 
 // Q5
-function conjunct_terms(q, size, callback){
+function conjunct_terms(q, size, langtag, callback){
 	
-	var data = {"query": {"common": {"string": {"query": q, "cutoff_frequency": 0.001, "low_freq_operator": "and"}}}, "size": size};
 
-//        if (langtag)
-//                var data={ "query": { "bool": { "must": { "match_phrase": { "string": q}}, "should": { "term": {"langtag": langtag }} }}, "size": size};
-//        else
-//                var data={"query": { "match_phrase": { "string": q } }, "size": size};
-
+        if (langtag)
+		var data = {"query": {"bool": { "must": [{"common": {"string": {"query": q, "cutoff_frequency": 0.85, "low_freq_operator": "and"}}}, { "term": {"langtag": langtag }}]}}, "size": size};
+	else
+		var data = {"query": {"common": {"string": {"query": q, "cutoff_frequency": 0.85, "low_freq_operator": "and"}}}, "size": size};
         console.log(data);
         request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
                 if (!error && response.statusCode == 200)
@@ -67,6 +67,7 @@ function conjunct_terms(q, size, callback){
                         console.log(body["hits"]["hits"]);
                         callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
                                 o["_source"]["triple"]["docid"]=o["_source"]["docid"];
+                                o["_source"]["triple"]["score"]=o["_score"];
                                 return o["_source"]["triple"];
                         }));
                 } else{
@@ -85,6 +86,7 @@ function lookup_fuzzy_terms(q, size, callback){
                 {
                         callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
                                 o["_source"]["triple"]["docid"]=o["_source"]["docid"];
+                                o["_source"]["triple"]["score"]=o["_score"];
                                 return o["_source"]["triple"];
                         }));
                         callback(body);
@@ -206,7 +208,7 @@ app.get('/langterms', function(req, res){
 });
 
 app.get('/conjunct', function(req, res){
-        conjunct_terms(req.param('pattern'), req.param('size') || 10, function(took, hits, cands){
+        conjunct_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
                 res.send({"took": took, "numhits": hits, "hits": cands});
         });
 });
