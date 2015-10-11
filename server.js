@@ -8,11 +8,11 @@ var SparqlClient = require('sparql-client');
 var query_url = 'http://localhost:9200/lotus/_search';
 
 // Q1 and Q4
-function lookup_terms(q, size, langtag, callback){
+function lookup_terms(q, size, langtag, max_exp, callback){
 	if (langtag)
-                var data={ "query": { "bool": { "must": [{ "match": { "string": q}}, { "term": {"langtag": langtag }}] }}, "size": size};
+                var data={ "query": { "bool": { "must": [{ "match": { "string": q, "max_expansions": max_exp}}, { "term": {"langtag": langtag }}] }}, "size": size};
 	else
-		var data={"query": { "match": { "string": q } }, "size": size};
+		var data={"query": { "match": { "string": q, "max_expansions": max_exp } }, "size": size};
 	console.log(data);
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
 		if (!error && response.statusCode == 200)
@@ -30,11 +30,11 @@ function lookup_terms(q, size, langtag, callback){
 }
 
 // Q2 and Q3
-function lookup_phrase(q, size, langtag, callback){
+function lookup_phrase(q, size, langtag, max_exp, callback){
 	if (langtag)
-                var data={ "query": { "bool": { "must": [{ "match_phrase": { "string": q}}, { "term": {"langtag": langtag }}] }}, "size": size};
+                var data={ "query": { "bool": { "must": [{ "match_phrase": { "string": q, "max_expansions": max_exp}}, { "term": {"langtag": langtag }}] }}, "size": size};
 	else
-		var data={"query": { "match_phrase": { "string": q}}, "size": size};
+		var data={"query": { "match_phrase": { "string": q, "max_expansions": max_exp}}, "size": size};
 	console.log(data);
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
 		if (!error && response.statusCode == 200)
@@ -53,13 +53,13 @@ function lookup_phrase(q, size, langtag, callback){
 }
 
 // Q5
-function conjunct_terms(q, size, langtag, callback){
+function conjunct_terms(q, size, langtag, max_exp, callback){
 	
 
         if (langtag)
-		var data = {"query": {"bool": { "must": [{"common": {"string": {"query": q, "cutoff_frequency": 0.85, "low_freq_operator": "and"}}}, { "term": {"langtag": langtag }}]}}, "size": size};
+		var data = {"query": {"bool": { "must": [{"common": {"string": {"query": q, "max_expansions": max_exp, "cutoff_frequency": 0.85, "low_freq_operator": "and"}}}, { "term": {"langtag": langtag }}]}}, "size": size};
 	else
-		var data = {"query": {"common": {"string": {"query": q, "cutoff_frequency": 0.85, "low_freq_operator": "and"}}}, "size": size};
+		var data = {"query": {"common": {"string": {"query": q, "max_expansions": max_exp, "cutoff_frequency": 0.85, "low_freq_operator": "and"}}}, "size": size};
         console.log(data);
         request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
                 if (!error && response.statusCode == 200)
@@ -72,18 +72,19 @@ function conjunct_terms(q, size, langtag, callback){
                         }));
                 } else{
                         console.log("ERROR: " + error);
+                        console.log(response.statusCode);
                 }
         });
 }
 
 // Q6
-function lookup_fuzzy_terms(q, size, langtag, callback){
+function lookup_fuzzy_terms(q, size, langtag, max_exp, callback){
 	var fuzziness_level = 1;
 	if (langtag)
-        	var data={"query": {"bool": { "must": [{ "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and" } } }, { "term": {"langtag": langtag}}]}}, "size": size};
+        	var data={"query": {"bool": { "must": [{ "fuzzy": { "string": { "value": q, "max_expansions": max_exp, "fuzziness": fuzziness_level } } }, { "term": {"langtag": langtag}}]}}, "size": size};
 	else
-        	var data={"query": { "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and" } } }, "size": size};
-        console.log(data);
+        	var data={"query": { "fuzzy": { "string": { "value": q, "fuzziness": fuzziness_level } } }, "size": size};
+        console.log(JSON.stringify(data));
         request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
                 if (!error && response.statusCode == 200)
                 {
@@ -92,11 +93,11 @@ function lookup_fuzzy_terms(q, size, langtag, callback){
                                 o["_source"]["triple"]["score"]=o["_score"];
                                 return o["_source"]["triple"];
                         }));
-                        callback(body);
                 } else{
                         console.log("ERROR: " + error);
-                }
-        });
+                        console.log(response.statusCode);
+                }        
+	});
 }
 
 /*
@@ -187,38 +188,26 @@ app.get('/cssload.css', function(req, res){
 });
 
 app.get('/phrase', function(req, res){
-	lookup_phrase(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
+	lookup_phrase(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", req.param('maxexp') || 33000, function(took, hits, cands){
                 res.send({"took": took, "numhits": hits, "hits": cands});
 	});
 });
 
 app.get('/terms', function(req, res){
-        lookup_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
+        lookup_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", req.param('maxexp') || 33000, function(took, hits, cands){
                 res.send({"took": took, "numhits": hits, "hits": cands});
         });
 });
 
 app.get('/conjunct', function(req, res){
-        conjunct_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
+        conjunct_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", req.param('maxexp') || 33000, function(took, hits, cands){
                 res.send({"took": took, "numhits": hits, "hits": cands});
         });
 });
 
 app.get('/fuzzyterms', function(req, res){
-        lookup_fuzzy_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
+        lookup_fuzzy_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", req.param('maxexp') || 3, function(took, hits, cands){
                 res.send({"took": took, "numhits": hits, "hits": cands});
-        });
-});
-
-app.get('/fuzzycandidates', function(req, res){
-        get_fuzzy_candidate_strings(req.param('query'), function(cands){
-                res.send(cands);
-        });
-});
-
-app.get('/identical', function(req, res){
-        get_identical_resources(req.param('query'), function(resources){
-                res.send(resources);
         });
 });
 
