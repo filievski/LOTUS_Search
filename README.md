@@ -10,10 +10,10 @@ http://lotus.lodlaundromat.org/terms?pattern=De%209%20straatjes&size=10&langtag=
 http://lotus.lodlaundromat.org/phrase?pattern=De%209%20straatjes&size=10&langtag=nl
 
 3. Conjunctive query (pattern, langtag, size):
-http://lotus.lodlaundromat.org/langterms?pattern=De%209%20straatjes&size=10&langtag=nl
+http://lotus.lodlaundromat.org/conjunct?pattern=De%209%20straatjes&size=10&langtag=nl
 
 4. Fuzzy conjunctive query (pattern, langtag, size, fuzziness_level):
-http://lotus.lodlaundromat.org/langphrase?pattern=De%209%20straatjes&size=10&langtag=nl&fuzziness_level=2
+http://lotus.lodlaundromat.org/fuzzyconjunct?pattern=De%209%20straatjes&size=10&langtag=nl&fuzziness_level=2
 
 ##Website
 
