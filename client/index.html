@@ -4,7 +4,7 @@
 <link rel="icon" 
       type="image/png" 
       href="teal-lotus.ico">
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.4/united/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.3/css/bootstrap-select.css">
 <link rel="stylesheet" type="text/css" href="cssload.css">
 
@@ -44,11 +44,10 @@ pre.apiCall {
     
     <div class="row">
         <div class="col-md-12">
-            <h2>Lookup text</h2>
-            <p>Find <a href="http://lodlaundromat.org" target="_blank">LOD Laundromat</a> statements where this string stands as (part of) the object</p>
+            <h3>Find <a href="http://lodlaundromat.org" target="_blank">LOD Laundromat</a> statements based on natural text</h3>
 			<form class="form-search" onsubmit="initDt(this);return false;" apiType="r2d">
 				<div class="input-group">
-				<div class="col-md-3"><label>String:</label>
+				<div class="col-md-8"><label>String:</label>
 				   <input type="text" class="form-control apiUri" id="r2dUri" placeholder="Harvard Environmental Law Review">
 				</div>
  				<div class="col-md-3"><label>String similarity function:</label>
@@ -62,18 +61,18 @@ pre.apiCall {
 				<div class="col-md-1"><label>Langtag:</label>
                                 <input type="text" class="form-control" id="langtag" placeholder="">
 				</div>
-                                <div class="col-md-3"><label>Show the first</label>
-                                   <select class="selectpicker" data-style="btn-primary" id="recordsize" width="100%">
+                                <div class="col-md-4"><Br><label>Retrieve best&nbsp;</label>
+					<select class="selectpicker" data-style="btn-primary" id="recordsize" width="100%">
                                           <option value="5">5</option>
                                           <option value="10" selected>10</option>
                                           <option value="20">20</option>
                                           <option value="50">50</option>
                                           <option value="100">100</option>
-                                        </select> <label> records</label>
-                                </div>
-				<div class="col-md-2"><Br>
+                                        </select>
+				</div>
+				<div class="col-md-1"><Br>
 				   <span>
-				        <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-search"></span> Find</button>
+				        <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-search"></span><strong>Find</strong></button>
 			           </span>
 				 </div>
 				</div>

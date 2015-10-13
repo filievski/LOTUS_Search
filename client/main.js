@@ -151,7 +151,7 @@ $.get( uri, function( hitsdata ) {
 		$("#circularG").hide();
  		$("#stats").html("Took <strong>" + hitsdata["took"] + "</strong> ms for <strong>" + hitsdata["numhits"] + "</strong> records.");
 		for (var i=0; i<hits.length; i++){
-			h+="<tr><td>&lt;" + hits[i]["subject"] + "&gt;<br/>&lt;" + hits[i]["predicate"] + "&gt;<br/>" + hits[i]["object"] + "</td><td><a role=\"button\" class=\"btn btn-default\" href=\"http://ldf.lodlaundromat.org/" + hits[i]["docid"] + "\" target=\"_blank\">Show document</a><br/><br/><a role=\"button\" class=\"btn btn-default\" href=\"http://lodlaundromat.org/resource/" + hits[i]["docid"] + "\" target=\"_blank\">Show metadata</a></td></tr>";
+			h+="<tr><td>S: <a href=\"" + hits[i]["subject"] + "\">" + hits[i]["subject"] + "</a><br/>P: <a href=\"" + hits[i]["predicate"] + "\">" + hits[i]["predicate"] + "</a><br/>O: <strong>" + hits[i]["object"] + "</strong></td><td><a role=\"button\" class=\"btn btn-default\" href=\"http://ldf.lodlaundromat.org/" + hits[i]["docid"] + "\" target=\"_blank\">Show document</a><br/><br/><a role=\"button\" class=\"btn btn-default\" href=\"http://lodlaundromat.org/resource/" + hits[i]["docid"] + "\" target=\"_blank\"> Show metadata</a></td></tr>";
 		}
 		h+="</tbody>";
 		oTable.html(h);
