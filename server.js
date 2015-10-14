@@ -4,7 +4,7 @@ var app = express();
 var async = require('async');
 var request = require('request');
 var SparqlClient = require('sparql-client');
-
+var fs = require('fs');
 var query_url = 'http://localhost:9200/lotus/_search';
 
 // Q1 and Q4
@@ -13,18 +13,15 @@ function lookup_terms(q, size, langtag, callback){
                 var data={ "query": { "bool": { "must": [{ "match": { "string": q}}, { "term": {"langtag": langtag }}] }}, "size": size};
 	else
 		var data={"query": { "match": { "string": q} }, "size": size};
-	console.log(data);
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+                logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
 		if (!error && response.statusCode == 200)
 		{
-			console.log(body["hits"]["hits"]);
 			callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
 				o["_source"]["triple"]["docid"]=o["_source"]["docid"];
 				o["_source"]["triple"]["score"]=o["_score"];
 				return o["_source"]["triple"];
 			}));
-		} else{
-                        console.log("ERROR" + error);
 		}
 	});
 }
@@ -35,20 +32,16 @@ function lookup_phrase(q, size, langtag, callback){
                 var data={ "query": { "bool": { "must": [{ "match_phrase": { "string": q }}, { "term": {"langtag": langtag }}] }}, "size": size};
 	else
 		var data={"query": { "match_phrase": { "string": q }}, "size": size};
-	console.log(data);
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+                logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
 		if (!error && response.statusCode == 200)
 		{
-			console.log(body["hits"]["hits"]);
                         callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
                                 o["_source"]["triple"]["docid"]=o["_source"]["docid"];
                                 o["_source"]["triple"]["score"]=o["_score"];
                                 return o["_source"]["triple"];
 			}));
-		} else{
-			console.log("ERROR" + error);
-			console.log(response.statusCode);
-		}
+		} 
 	});
 }
 
@@ -59,20 +52,16 @@ function conjunct_terms(q, size, langtag, callback){
 		var data = {"query": {"bool": { "must": [{"common": {"string": {"query": q, "cutoff_frequency": 0.85, "low_freq_operator": "and"}}}, { "term": {"langtag": langtag }}]}}, "size": size};
 	else
 		var data = {"query": {"common": {"string": {"query": q, "cutoff_frequency": 0.85, "low_freq_operator": "and"}}}, "size": size};
-        console.log(data);
         request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+                logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
                 if (!error && response.statusCode == 200)
                 {
-                        console.log(body["hits"]["hits"]);
                         callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
                                 o["_source"]["triple"]["docid"]=o["_source"]["docid"];
                                 o["_source"]["triple"]["score"]=o["_score"];
                                 return o["_source"]["triple"];
                         }));
-                } else{
-                        console.log("ERROR: " + error);
-                        console.log(response.statusCode);
-                }
+                } 
         });
 }
 
@@ -82,8 +71,8 @@ function lookup_fuzzy_terms(q, size, langtag, fuzziness_level, callback){
         	var data={"query": {"bool": { "must": [{ "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and"} } }, { "term": {"langtag": langtag}}]}}, "size": size};
 	else
         	var data={"query": { "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and"} } }, "size": size};
-        console.log(JSON.stringify(data));
         request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+		logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
                 if (!error && response.statusCode == 200)
                 {
                         callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
@@ -91,10 +80,12 @@ function lookup_fuzzy_terms(q, size, langtag, fuzziness_level, callback){
                                 o["_source"]["triple"]["score"]=o["_score"];
                                 return o["_source"]["triple"];
                         }));
-                } else{
-                        console.log("ERROR: " + error);
-                        console.log(response.statusCode);
-                }        
+                }       
+	});
+}
+
+var logRequest = function(error, statusCode, reqJson, took, numhits) {
+	fs.appendFile('reqs.txt', new Date().toISOString() + ' | ' +  error + ' | ' + statusCode + ' | ' + reqJson + ' | ' + took + ' | ' + numhits + '\n', function (err){
 	});
 }
 
