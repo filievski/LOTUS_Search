@@ -1,54 +1,14 @@
 
 var express = require('express');
 var app = express();
+var async = require('async');
 var request = require('request');
+var SparqlClient = require('sparql-client');
 var fs = require('fs');
-var query_url = 'http://es.fii800.eculture.labs.vu.nl/lotus/_search';
+var query_url = 'http://localhost:9200/lotus/_search';
 
-var numeric_ranks = {"degree": "degree", "numdocs": "r2d", "modified": "ts", "lengthnorm": "words"};
-
-function retrieve(q, langtag, size, matching, ranking, callback){
-	// MATCHING
-	slop=3;
-	minmatch="70%";
-	fuzziness_level=1;
-	cutoff_freq=0.85;
-	if (matching=="terms"){
-		var mq={ "match": { "string": {"query": q, "minimum_should_match": minmatch}}};
-	 } else if (matching=="phrase"){
-		var mq={ "match_phrase": { "string": {"query": q, "slop": slop}}};
-	} else if (matching=="conjunct"){
-		var mq = {"common": {"string": {"query": q, "cutoff_frequency": cutoff_freq, "low_freq_operator": "and"}}};
-	} else { //Fuzzy
-		var mq = { "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and"} } };
-	}
-
-	// RANKING
-
-	if (ranking in numeric_ranks){ // Relational ranking
-		key=numeric_ranks[ranking];
-		var data={ "query": { "function_score": { "query": mq , "field_value_factor": { "field": "ts", "modifier": "log1p" }, "boost_mode": "replace" } }, "size": size };
-	} else { // Content-based ranking
-		console.log(ranking);
-		if (ranking=="proximity") {
-			rq={ "match_phrase": { "string": {"query": q, "slop": slop}}};
-			var data={"query":{"bool":{"must": mq, "should": rq }}, "size": size};
-		}
-		else if (ranking=="default"){
-			if (langtag!="any"){
-				var data={"query":{"bool":{"must": [mq, {"term": {"langtag": langtag }}]}}, "size": size};
-      			} else
-              			var data={"query": mq, "size": size};
-		}
-	}
-
-	// LANGTAG
-//	if (langtag!="any"){
-//		var data={"query":{"bool":{"must": [mq, {"term": {"langtag": langtag }}]}}, "size": size};
-//	} else
-//		var data={"query": mq, "size": size};
-
-	console.log(JSON.stringify(data));
+function unique_subjects(callback){
+        var data={"query": { "aggs": { "rsrces": {"terms": { "field": "triple.subject", "size": "0"} }}}, "size": size};
         request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
                 logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
                 if (!error && response.statusCode == 200)
@@ -60,7 +20,6 @@ function retrieve(q, langtag, size, matching, ranking, callback){
                         }));
                 }
         });
-
 }
 
 // Q1 and Q4
@@ -146,7 +105,72 @@ var logRequest = function(error, statusCode, reqJson, took, numhits) {
 	});
 }
 
+/*
+function lookup_bool(q, size, langtag, callback){
+	if (langtag!="")
+        	var data={ "query": { "bool": { "must": { "match_phrase": { "string": q}}, "should": { "term": {"langtag": langtag }} }}};
+	else
+		var data={"query": { "match": { "string": q, "operator": "and" } }, "size": size};
+	console.log(data);
+	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+		if (!error && response.statusCode == 200)
+		{
+			console.log(body);
+			callback(body);
+		} else{
+			console.log("ERROR" + error);
+		}
+	});
+}
 
+function get_fuzzy_candidate_strings(q, callback){
+	data={"query": {
+		"fuzzy_like_this_field": {
+		    "string": {
+			"like_text" :         q,
+        		"max_query_terms" : 12
+		    }
+		}
+	    }};
+      
+	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+                if (!error && response.statusCode == 200)
+                {
+                        console.log(body);
+                        callback(body);
+                } else{
+                        console.log("ERROR" + error);
+                }
+        });
+}
+*/
+
+function get_identical_resources(q, callback){
+/*
+	query = encodeURIComponent("SELECT * WHERE { GRAPH ?g { ?hello owl:sameAs ?res } } LIMIT 5");
+        data = {"query": query};
+        request({url: 'http://localhost:8890/sparql', method: 'POST', json: true, headers: { "accept": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+                if (!error && response.statusCode == 200)
+                {
+                        console.log(body);
+                        callback(body);
+                } else{
+                        console.log("ERROR" + error);
+                }
+        });
+
+*/
+	var endpoint = 'http://localhost:8890/sparql';
+        var query = "SELECT ?res WHERE { { <" + q + "> owl:sameAs ?res } UNION { ?res owl:sameAs <" + q + "> } }";
+	var client = new SparqlClient(endpoint);
+	client.query(query).execute({format: 'resource', resource: 'res'}, function(error, results) {
+		callback(results["results"]["bindings"]);
+	});
+}
+
+function query_anytime(word, func){
+	func(word + "!");
+}
 
 app.get('/', function(req, res){
     res.sendFile('index.html', {root:'./client'});
@@ -168,18 +192,6 @@ app.get('/cssload.css', function(req, res){
     res.sendFile('cssload.css', {root:'./client'});
 });
 
-app.get('/retrieve', function(req, res){
-	if (req.param('string') && req.param('match') && req.param('match')){
-		retrieve(req.param('string'), req.param('langtag') || 'any', req.param('size') || 10, req.param('match'), req.param('rank'), function(took, hits, cands){
-			res.send({"took": took, "numhits": hits, "hits": cands});
-		});
-	}
-	else
-		res.send("Error: not all parameters set!");
-});
-
-
-/*
 app.get('/phrase', function(req, res){
 	lookup_phrase(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
                 res.send({"took": took, "numhits": hits, "hits": cands});
@@ -203,5 +215,5 @@ app.get('/fuzzyconjunct', function(req, res){
                 res.send({"took": took, "numhits": hits, "hits": cands});
         });
 });
-*/
+
 app.listen(8080);

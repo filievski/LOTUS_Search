@@ -141,8 +141,7 @@ var initDt = function(formEl) {
     var oTable = $('#jsontable');
     oTable.hide();
 
-        var uri = '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
-
+        var uri = '/retrieve?string=' + encodeURIComponent($('#r2dUri').val()) + "&match=" + $("#matching").val() + "&rank=" + $("#ranking").val() + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
 		$("#circularG").show();
 $.get( uri, function( hitsdata ) {
 		var hits=hitsdata["hits"];
@@ -165,7 +164,7 @@ function numberWithCommas(x) {
 }
 
 var getUriString = function() {
-    	return '/' + $("#querytype").val() + '?pattern=' + encodeURIComponent($('#r2dUri').val()) + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
+    	return '/retrieve?string=' + encodeURIComponent($('#r2dUri').val()) + "&match=" + $("#matching").val() + "&rank=" + $("#ranking").val() + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
 }
 var ensureInputValue = function(el) {
     if (el.val().length > 0) {
