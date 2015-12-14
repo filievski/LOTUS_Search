@@ -7,12 +7,27 @@ var SparqlClient = require('sparql-client');
 var fs = require('fs');
 var query_url = 'http://localhost:9200/lotus/_search';
 
+function unique_subjects(callback){
+        var data={"query": { "aggs": { "rsrces": {"terms": { "field": "triple.subject", "size": "0"} }}}, "size": size};
+        request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+                logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
+                if (!error && response.statusCode == 200)
+                {
+                        callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
+                                o["_source"]["triple"]["docid"]=o["_source"]["docid"];
+                                o["_source"]["triple"]["score"]=o["_score"];
+                                return o["_source"]["triple"];
+                        }));
+                }
+        });
+}
+
 // Q1 and Q4
 function lookup_terms(q, size, langtag, callback){
 	if (langtag)
-                var data={ "query": { "bool": { "must": [{ "match": { "string": q}}, { "term": {"langtag": langtag }}] }}, "size": size};
+                var data={ "query": { "bool": { "must": [{ "match": { "string": {"query": q, "minimum_should_match": "50%"}}}, { "term": {"langtag": langtag }}] }}, "size": size};
 	else
-		var data={"query": { "match": { "string": q} }, "size": size};
+		var data={"query": { "match": { "string": {"query": q, "minimum_should_match": "50%"} }}, "size": size};
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
                 logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
 		if (!error && response.statusCode == 200)
@@ -28,10 +43,11 @@ function lookup_terms(q, size, langtag, callback){
 
 // Q2 and Q3
 function lookup_phrase(q, size, langtag, callback){
+	var slop=3;
 	if (langtag)
-                var data={ "query": { "bool": { "must": [{ "match_phrase": { "string": q }}, { "term": {"langtag": langtag }}] }}, "size": size};
+                var data={ "query": { "bool": { "must": [{ "match_phrase": { "string": {"query": q, "slop": slop}}}, { "term": {"langtag": langtag }}] }}, "size": size};
 	else
-		var data={"query": { "match_phrase": { "string": q }}, "size": size};
+		var data={"query": { "match_phrase": { "string": {"query": q, "slop": slop }}}, "size": size};
 	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
                 logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
 		if (!error && response.statusCode == 200)
