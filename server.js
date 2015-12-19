@@ -3,44 +3,49 @@ var express = require('express');
 var app = express();
 var request = require('request');
 var fs = require('fs');
-var query_url = 'http://es.fii800.eculture.labs.vu.nl/lotus/_search';
+var configurationFile = 'config.json';
 
-var numeric_ranks = {"degree": "degree", "numdocs": "r2d", "modified": "ts", "lengthnorm": "words"};
+var configuration = JSON.parse(
+    fs.readFileSync(configurationFile)
+);
+
+var query_url = 'https://' + configuration.auth + '@lotus.lucy.surfsara.nl/lotus/_search';
+
+var numeric_ranks = {"degree": "degree", "numdocs": "r2d", "recency": "timestamp", "lengthnorm": "length", "semrichness": "sr", "termrichness": "tr"};
 
 function retrieve(q, langtag, size, matching, ranking, callback){
-	// MATCHING
-	slop=3;
-	minmatch="70%";
-	fuzziness_level=1;
-	cutoff_freq=0.85;
-	if (matching=="terms"){
-		var mq={ "match": { "string": {"query": q, "minimum_should_match": minmatch}}};
-	 } else if (matching=="phrase"){
-		var mq={ "match_phrase": { "string": {"query": q, "slop": slop}}};
-	} else if (matching=="conjunct"){
-		var mq = {"common": {"string": {"query": q, "cutoff_frequency": cutoff_freq, "low_freq_operator": "and"}}};
-	} else { //Fuzzy
-		var mq = { "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and"} } };
-	}
+        // MATCHING
+        slop=1;
+        minmatch="70%";
+        fuzziness_level=1;
+        cutoff_freq=0.85;
+        if (matching=="terms"){
+                var mq={ "match": { "string": {"query": q, "minimum_should_match": minmatch}}};
+         } else if (matching=="phrase"){
+                var mq={ "match_phrase": { "string": {"query": q, "slop": slop}}};
+        } else if (matching=="conjunct"){
+                var mq = {"common": {"string": {"query": q, "cutoff_frequency": cutoff_freq, "low_freq_operator": "and"}}};
+        } else { //Fuzzy
+                var mq = { "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and"} } };
+        }
 
-	// RANKING
+        // RANKING
 
-	if (ranking in numeric_ranks){ // Relational ranking
-		key=numeric_ranks[ranking];
-		var data={ "query": { "function_score": { "query": mq , "field_value_factor": { "field": "ts", "modifier": "log1p" }, "boost_mode": "replace" } }, "size": size };
-	} else { // Content-based ranking
-		console.log(ranking);
-		if (ranking=="proximity") {
-			rq={ "match_phrase": { "string": {"query": q, "slop": slop}}};
-			var data={"query":{"bool":{"must": mq, "should": rq }}, "size": size};
-		}
-		else if (ranking=="default"){
-			if (langtag!="any"){
-				var data={"query":{"bool":{"must": [mq, {"term": {"langtag": langtag }}]}}, "size": size};
-      			} else
-              			var data={"query": mq, "size": size};
-		}
-	}
+        if (ranking in numeric_ranks){ // Relational ranking
+                key=numeric_ranks[ranking];
+                var data={ "query": { "function_score": { "query": mq , "field_value_factor": { "field": key }, "boost_mode": "replace" } }, "size": size };
+        } else { // Content-based ranking
+                if (ranking=="proximity") {
+                        rq={ "match_phrase": { "string": {"query": q, "slop": slop}}};
+                        var data={"query":{"bool":{"must": mq, "should": rq }}, "size": size};
+                }
+                else if (ranking=="psf"){
+                        if (langtag!="any"){
+                                var data={"query":{"bool":{"must": [mq, {"term": {"langtag": langtag }}]}}, "size": size};
+                        } else
+                                var data={"query": mq, "size": size};
+                }
+        }
 
 	// LANGTAG
 //	if (langtag!="any"){
@@ -54,9 +59,8 @@ function retrieve(q, langtag, size, matching, ranking, callback){
                 if (!error && response.statusCode == 200)
                 {
                         callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
-                                o["_source"]["triple"]["docid"]=o["_source"]["docid"];
-                                o["_source"]["triple"]["score"]=o["_score"];
-                                return o["_source"]["triple"];
+        //                        return {"subject": o["_source"]["subject"], "predicate": o["_source"]["predicate"], "object": o["_source"]["string"], "docid": o["_source"]["docid"]};
+				return o["_source"];
                         }));
                 }
         });
@@ -204,4 +208,4 @@ app.get('/fuzzyconjunct', function(req, res){
         });
 });
 */
-app.listen(8080);
+app.listen(8181);
