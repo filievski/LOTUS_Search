@@ -1,0 +1,29 @@
+<html>
+<head>
+<title> Documentation </title>
+
+<body>
+<table border="1">
+<thead><th>Parameter</th><th>Default value?</th><th>Example value</th><th>Comment</th></thead>
+<tr><td></td><td></td><td></td><td></td></tr>
+<tr><td><u>I. Core parameters</u></td><td></td><td></td><td></td></tr>
+<tr><td>string</td><td>no default (must be specified!)</td><td>Hello I love you</td><td>string to look for in the object position of RDF statements</td></tr>
+<tr><td>match</td><td>phrase</td><td>terms</td><td>matching algorithm, one of: terms, phrase, conjunct, fuzzyconjunct</td></tr>
+<tr><td>rank</td><td>psf</td><td>recency</td><td>ranking algorithm, one of: lengthnorm, psf, proximity, semrichness, termrichness, recency, degree, numdocs</td></tr>
+<tr><td>size</td><td>10</td><td>50</td><td>number of best scored results to be returned</td></tr>
+<tr><td></td><td></td><td></td><td></td></tr>
+<tr><td><u>II. Optional filtering parameters</u></td><td></td><td></td><td></td></tr>
+<tr><td>langtag</td><td>no default</td><td>en</td><td>filter by specifying a two-letter language tag of the results.</td></tr>
+<tr><td>subject</td><td>no default</td><td>http://dbpedia.org/resource/Chicago or Chicago or *dbpedia*</td><td>filter by (part of) subject URI. To filter by single keywords or parts of a keyword, use wildcards.</td></tr>
+<tr><td>predicate</td><td>no default</td><td>http://www.w3.org/2000/01/rdf-schema#label or label or *w3.org*</td><td>filter by (part of) predicate URI. To filter by single keywords or parts of a keyword, use wildcards.</td></tr>
+<tr><td>noblank</td><td>false</td><td>true</td><td>filter out the blank nodes</td></tr>
+<tr><td></td><td></td><td></td></tr>
+<tr><td><u>III. Hyperparameters for specific matching functions</u></td><td></td><td></td><td></td></tr>
+<tr><td>slop</td><td>1</td><td>3</td><td>can be specified for the 'phrase' matching, it is the edit distance on token level allowed. higher slop adds flexibility of matching, though it has increased computational cost</td></tr>
+<tr><td>minmatch</td><td>70%</td><td>15%</td><td>can be specified for the 'terms' matching, to indicate the percentage of query tokens that have to be matched. higher percentage required means more strict matching. 100% acts the same as a terms algorithm with 'AND' logical operator.</td></tr>
+<tr><td>cutoff</td><td>0.001</td><td>0.005</td><td>can be specified for the 'conjunct' matching, it is a cutoff value to get rid of commonly occurring terms. If a term occurs in bigger part of the documents than the cutoff value, then it is ignored.</td></tr>
+<tr><td>fuzziness</td><td>1</td><td>3</td><td>can be specified for the 'fuzzyconjunct' matching, it is the edit distance on character level allowed. higher fuzziness adds flexibility of matching, though it has increased computational cost</td></tr>
+</table>
+</body>
+
+</html>
