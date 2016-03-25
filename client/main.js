@@ -140,8 +140,9 @@ var initDt = function(formEl) {
     destroy(type);
     var oTable = $('#jsontable');
     oTable.hide();
-
-        var uri = '/retrieve?string=' + encodeURIComponent($('#r2dUri').val()) + "&match=" + $("#matching").val() + "&rank=" + $("#ranking").val() + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
+    if ($('#noblank').prop('checked')) var noblank="true";
+    else var noblank="false";
+        var uri = '/retrieve?string=' + encodeURIComponent($('#r2dUri').val()) + "&match=" + $("#matching").val() + "&rank=" + $("#ranking").val() + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val()) + "&noblank=" + noblank;
 		$("#circularG").show();
 $.get( uri, function( hitsdata ) {
 		var hits=hitsdata["hits"];
@@ -164,7 +165,9 @@ function numberWithCommas(x) {
 }
 
 var getUriString = function() {
-    	return '/retrieve?string=' + encodeURIComponent($('#r2dUri').val()) + "&match=" + $("#matching").val() + "&rank=" + $("#ranking").val() + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val());
+    if ($('#noblank').prop('checked')) var noblank="true";
+    else var noblank="false";
+    	return '/retrieve?string=' + encodeURIComponent($('#r2dUri').val()) + "&match=" + $("#matching").val() + "&rank=" + $("#ranking").val() + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val()) + "&noblank=" + noblank;
 }
 var ensureInputValue = function(el) {
     if (el.val().length > 0) {
