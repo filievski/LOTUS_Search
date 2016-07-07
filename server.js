@@ -32,34 +32,51 @@ function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_f
                 key=numeric_ranks[ranking];
 		//if (key=="degree" || key=="r2d")
 		//	query_url='https://' + configuration.auth + '@lotus.lucy.surfsara.nl/lotus22/_search';
-                var data={ "query": { "function_score": { "query": mq , "field_value_factor": { "field": key }, "boost_mode": "replace" } }, "size": size };
+		var must=mq;
+			if (langtag!="dontcare") must.push({"term": {"langtag": langtag }});
+                var data={ "query": { "function_score": { "query": {"bool": {"must": must}} , "field_value_factor": { "field": key }, "boost_mode": "replace" } }, "size": size };
+
+		if (subject){
+			data["query"]["function_score"]["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.subject", "query": subject}});
+		}
+		if (predicate){
+			data["query"]["function_score"]["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.predicate", "query": predicate}});
+		} 
+		if (filterBlankNodes){
+			data["query"]["function_score"]["query"]["bool"]["must_not"]= [{"query_string": {"default_field": "lit.subject","query": "http://lodlaundromat.org/.well-known/genid"}}];
+		}
+
+
         } else { // Content-based ranking
                 if (ranking=="proximity") {
+                	var must=mq;
+                        	if (langtag!="dontcare") must.push({"term": {"langtag": langtag }});
                         rq={ "match_phrase": { "string": {"query": q, "slop": slop}}};
-                        var data={"query":{"bool":{"must": mq, "should": rq }}, "size": size};
+                        var data={"query":{"bool":{"must": must, "should": rq }}, "size": size};
                 }
                 else if (ranking=="psf"){
 			var must=mq;
-                        if (langtag!="any"){
-				if (langtag!="any") must.push({"term": {"langtag": langtag }});
+				if (langtag!="dontcare") must.push({"term": {"langtag": langtag }});
 				//if (subject!="") must.push({"term": {"subject": subject }});
 				//if (predicate!="") must.push({"term": {"predicate": "http://era.rkbexplorer.com/id/title" }});
-			}
                         var data={"query": {"bool":{"must": must}}, "size": size};
                         //} else
                         //        var data={"query": mq, "size": size};
                 }
+
+		if (subject){
+			data["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.subject", "query": subject}});
+		}
+		if (predicate){
+			data["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.predicate", "query": predicate}});
+		} 
+		if (filterBlankNodes){
+			data["query"]["bool"]["must_not"]= [{"query_string": {"default_field": "lit.subject","query": "http://lodlaundromat.org/.well-known/genid"}}];
+		}
+
         }
-	if (subject){
-		data["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.subject", "query": subject}});
-	}
-	if (predicate){
-                data["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.predicate", "query": predicate}});
-        } 
-	if (filterBlankNodes){
-		data["query"]["bool"]["must_not"]= [{"query_string": {"default_field": "lit.subject","query": "http://lodlaundromat.org/.well-known/genid"}}];
-	}
 	
+	fs.appendFile('logme.txt', JSON.stringify(data));
 	// LANGTAG
 //	if (langtag!="any"){
 //		var data={"query":{"bool":{"must": [mq, {"term": {"langtag": langtag }}]}}, "size": size};
@@ -174,6 +191,10 @@ app.get('/docs', function(req, res){
     res.sendFile('docs.html', {root:'./client'});
 });
 
+app.get('/stats', function(req, res){
+    res.sendFile('stats.html', {root:'./client'});
+});
+
 app.get('/main.js', function(req, res){
     res.sendFile('main.js', {root:'./client'});
 });
@@ -195,19 +216,27 @@ app.get('/retrieve', function(req, res){
         minmatch="70%";
         fuzziness_level=1;
         cutoff_freq=0.85;
-
 	if (req.param('string')){
 		var ip = req.headers['x-forwarded-for'] || 
 		     req.connection.remoteAddress || 
 		     req.socket.remoteAddress ||
 		     req.connection.socket.remoteAddress;
-		retrieve(req.param('string'), req.param('langtag') || 'any', req.param('size') || 10, req.param('match') || 'phrase', req.param('rank') || 'psf', req.param('slop') || 1, req.param('minmatch') || '70%', req.param('cutoff') || 0.001, req.param('fuzziness') || 1, ip, req.param('subject'), req.param('predicate'), req.param('noblank')=="true", function(took, hits, cands){
+		if (req.param('langannotator')=='auto')
+			var l='a_' + req.param('langtag');
+		else if (req.param('langannotator')=='other')
+                        var l='any';
+		else {
+			if (req.param('langtag')){
+				var l='u_' + req.param('langtag');
+			} else {
+				var l='dontcare';
+			}
+		}
+		retrieve(req.param('string'), l, req.param('size') || 10, req.param('match') || 'phrase', req.param('rank') || 'psf', req.param('slop') || 1, req.param('minmatch') || '70%', req.param('cutoff') || 0.001, req.param('fuzziness') || 1, ip, req.param('subject'), req.param('predicate'), req.param('noblank')=="true", function(took, hits, cands){
 			res.send({"took": took, "numhits": hits, "hits": cands});
 		});
-	}
-	else{
-		res.status(400)        // HTTP status 404: NotFound
-   		.send('Error: please set the string parameter!');
+	} else{
+		res.send("Please supply a string parameter");
 	}
 });
 
