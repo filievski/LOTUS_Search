@@ -13,9 +13,8 @@ var query_url = 'https://' + configuration.auth + '@lotus.lucy.surfsara.nl/lotus
 
 var numeric_ranks = {"degree": "degree", "numdocs": "r2d", "recency": "timestamp", "lengthnorm": "length", "semrichness": "sr", "termrichness": "tr"};
 
-function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_freq, fuzziness_level, ip, subject, predicate, filterBlankNodes, callback){
+function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_freq, fuzziness_level, subject, predicate, filterBlankNodes, callback){
         // MATCHING
-	fs.appendFile("out.txt", filterBlankNodes + "\n");
         if (matching=="terms"){
                 var mq=[{ "match": { "string": {"query": q, "minimum_should_match": minmatch}}}];
         } else if (matching=="phrase"){
@@ -75,18 +74,15 @@ function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_f
 		}
 
         }
-	
-	fs.appendFile('logme.txt', JSON.stringify(data));
+	console.log(data);	
 	// LANGTAG
 //	if (langtag!="any"){
 //		var data={"query":{"bool":{"must": [mq, {"term": {"langtag": langtag }}]}}, "size": size};
 //	} else
 //		var data={"query": mq, "size": size};
-        fs.appendFile("out.txt", JSON.stringify(data) + "\n");
-        request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
+        request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: data}, function(error, response, body) {
                
 		console.log(body);
-		logRequest(error, response.statusCode.toString(), ip, JSON.stringify(data), body["took"], body["hits"]["total"]);
                 if (!error && response.statusCode == 200)
                 {
                         callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
@@ -191,10 +187,6 @@ app.get('/docs', function(req, res){
     res.sendFile('docs.html', {root:'./client'});
 });
 
-app.get('/stats', function(req, res){
-    res.sendFile('stats.html', {root:'./client'});
-});
-
 app.get('/main.js', function(req, res){
     res.sendFile('main.js', {root:'./client'});
 });
@@ -217,10 +209,10 @@ app.get('/retrieve', function(req, res){
         fuzziness_level=1;
         cutoff_freq=0.85;
 	if (req.param('string')){
-		var ip = req.headers['x-forwarded-for'] || 
-		     req.connection.remoteAddress || 
-		     req.socket.remoteAddress ||
-		     req.connection.socket.remoteAddress;
+		//var ip = req.headers['x-forwarded-for'] || 
+		//     req.connection.remoteAddress || 
+		//     req.socket.remoteAddress ||
+		//     req.connection.socket.remoteAddress;
 		if (req.param('langannotator')=='auto')
 			var l='a_' + req.param('langtag');
 		else if (req.param('langannotator')=='other')
@@ -232,7 +224,7 @@ app.get('/retrieve', function(req, res){
 				var l='dontcare';
 			}
 		}
-		retrieve(req.param('string'), l, req.param('size') || 10, req.param('match') || 'phrase', req.param('rank') || 'psf', req.param('slop') || 1, req.param('minmatch') || '70%', req.param('cutoff') || 0.001, req.param('fuzziness') || 1, ip, req.param('subject'), req.param('predicate'), req.param('noblank')=="true", function(took, hits, cands){
+		retrieve(req.param('string'), l, req.param('size') || 10, req.param('match') || 'phrase', req.param('rank') || 'psf', req.param('slop') || 1, req.param('minmatch') || '70%', req.param('cutoff') || 0.001, req.param('fuzziness') || 1, req.param('subject'), req.param('predicate'), req.param('noblank')=="true", function(took, hits, cands){
 			res.send({"took": took, "numhits": hits, "hits": cands});
 		});
 	} else{
