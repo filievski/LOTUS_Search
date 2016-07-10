@@ -13,7 +13,7 @@ var query_url = 'https://' + configuration.auth + '@lotus.lucy.surfsara.nl/lotus
 
 var numeric_ranks = {"degree": "degree", "numdocs": "r2d", "recency": "timestamp", "lengthnorm": "length", "semrichness": "sr", "termrichness": "tr"};
 
-function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_freq, fuzziness_level, subject, predicate, filterBlankNodes, callback){
+function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_freq, fuzziness_level, subject, predicate, filterBlankNodes, scorers, callback){
         // MATCHING
         if (matching=="terms"){
                 var mq=[{ "match": { "string": {"query": q, "minimum_should_match": minmatch}}}];
@@ -35,6 +35,7 @@ function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_f
 			if (langtag!="dontcare") must.push({"term": {"langtag": langtag }});
                 var data={ "query": { "function_score": { "query": {"bool": {"must": must}} , "field_value_factor": { "field": key }, "boost_mode": "replace" } }, "size": size };
 
+
 		if (subject){
 			data["query"]["function_score"]["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.subject", "query": subject}});
 		}
@@ -46,7 +47,33 @@ function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_f
 		}
 
 
-        } else { // Content-based ranking
+        }
+	else if (ranking=="mix"){
+		var must=mq;
+		if (langtag!="dontcare") must.push({"term": {"langtag": langtag }});
+		var func=[];
+		//var scorers={"length":0.5, "timestamp":0.1, "tr": 0.4};
+		var keys=Object.keys( scorers );
+		for( var i = 0,length = keys.length; i < length; i++ ) {
+			func.push({"field_value_factor": {"field": keys[i], "factor": scorers[keys[i]]}}); 
+		}
+//		for (var scorer in scorers){
+//			func.push({"field_value_factor": {"field": scorers, "factor": scorers[scorer]}});	
+//		}		
+		var data={ "query": { "function_score": { "query": {"bool": {"must": must}} , "functions": func, "boost_mode": "replace", "score_mode": "sum" } }, "size": size };	
+                if (subject){
+                        data["query"]["function_score"]["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.subject", "query": subject}});
+                }
+                if (predicate){
+                        data["query"]["function_score"]["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.predicate", "query": predicate}});
+                }
+                if (filterBlankNodes){
+                        data["query"]["function_score"]["query"]["bool"]["must_not"]= [{"query_string": {"default_field": "lit.subject","query": "http://lodlaundromat.org/.well-known/genid"}}];
+                }
+		console.log(data);
+
+	}
+	else { // Content-based ranking
                 if (ranking=="proximity") {
                 	var must=mq;
                         	if (langtag!="dontcare") must.push({"term": {"langtag": langtag }});
@@ -224,7 +251,7 @@ app.get('/retrieve', function(req, res){
 				var l='dontcare';
 			}
 		}
-		retrieve(req.param('string'), l, req.param('size') || 10, req.param('match') || 'phrase', req.param('rank') || 'psf', req.param('slop') || 1, req.param('minmatch') || '70%', req.param('cutoff') || 0.001, req.param('fuzziness') || 1, req.param('subject'), req.param('predicate'), req.param('noblank')=="true", function(took, hits, cands){
+		retrieve(req.param('string'), l, req.param('size') || 10, req.param('match') || 'phrase', req.param('rank') || 'psf', req.param('slop') || 1, req.param('minmatch') || '70%', req.param('cutoff') || 0.001, req.param('fuzziness') || 1, req.param('subject'), req.param('predicate'), req.param('noblank')=="true", JSON.parse(req.param('scorers')) || {}, function(took, hits, cands){
 			res.send({"took": took, "numhits": hits, "hits": cands});
 		});
 	} else{
