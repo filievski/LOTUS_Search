@@ -4,6 +4,8 @@ var app = express();
 var request = require('request');
 var fs = require('fs');
 var configurationFile = 'config.json';
+var uniqBy = require('lodash/uniqBy');
+
 
 var configuration = JSON.parse(
     fs.readFileSync(configurationFile)
@@ -13,7 +15,7 @@ var query_url = 'https://' + configuration.auth + '@lotus.lucy.surfsara.nl/lotus
 
 var numeric_ranks = {"degree": "degree", "numdocs": "r2d", "recency": "timestamp", "lengthnorm": "length", "semrichness": "sr", "termrichness": "tr"};
 
-function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_freq, fuzziness_level, subject, predicate, filterBlankNodes, scorers, callback){
+function retrieve(q, langtag, start, size,  matching, ranking, slop, minmatch, cutoff_freq, fuzziness_level, subject, predicate, filterBlankNodes, scorers, callback){
         // MATCHING
         if (matching=="terms"){
                 var mq=[{ "match": { "string": {"query": q, "minimum_should_match": minmatch}}}];
@@ -33,7 +35,7 @@ function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_f
 		//	query_url='https://' + configuration.auth + '@lotus.lucy.surfsara.nl/lotus22/_search';
 		var must=mq;
 			if (langtag!="dontcare") must.push({"term": {"langtag": langtag }});
-                var data={ "query": { "function_score": { "query": {"bool": {"must": must}} , "field_value_factor": { "field": key }, "boost_mode": "replace" } }, "size": size };
+                var data={ "query": { "function_score": { "query": {"bool": {"must": must}} , "field_value_factor": { "field": key }, "boost_mode": "replace" } }, "size": size, "from": start };
 
 
 		if (subject){
@@ -60,7 +62,7 @@ function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_f
 //		for (var scorer in scorers){
 //			func.push({"field_value_factor": {"field": scorers, "factor": scorers[scorer]}});	
 //		}		
-		var data={ "query": { "function_score": { "query": {"bool": {"must": must}} , "functions": func, "boost_mode": "replace", "score_mode": "sum" } }, "size": size };	
+		var data={ "query": { "function_score": { "query": {"bool": {"must": must}} , "functions": func, "boost_mode": "replace", "score_mode": "sum" } }, "size": size};	
                 if (subject){
                         data["query"]["function_score"]["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.subject", "query": subject}});
                 }
@@ -70,7 +72,6 @@ function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_f
                 if (filterBlankNodes){
                         data["query"]["function_score"]["query"]["bool"]["must_not"]= [{"query_string": {"default_field": "lit.subject","query": "http://lodlaundromat.org/.well-known/genid"}}];
                 }
-		console.log(data);
 
 	}
 	else { // Content-based ranking
@@ -78,14 +79,14 @@ function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_f
                 	var must=mq;
                         	if (langtag!="dontcare") must.push({"term": {"langtag": langtag }});
                         rq={ "match_phrase": { "string": {"query": q, "slop": slop}}};
-                        var data={"query":{"bool":{"must": must, "should": rq }}, "size": size};
+                        var data={"query":{"bool":{"must": must, "should": rq }}, "size": size, "from": start};
                 }
                 else if (ranking=="psf"){
 			var must=mq;
 				if (langtag!="dontcare") must.push({"term": {"langtag": langtag }});
 				//if (subject!="") must.push({"term": {"subject": subject }});
 				//if (predicate!="") must.push({"term": {"predicate": "http://era.rkbexplorer.com/id/title" }});
-                        var data={"query": {"bool":{"must": must}}, "size": size};
+                        var data={"query": {"bool":{"must": must}}, "size": size, "from": start};
                         //} else
                         //        var data={"query": mq, "size": size};
                 }
@@ -101,107 +102,24 @@ function retrieve(q, langtag, size,  matching, ranking, slop, minmatch, cutoff_f
 		}
 
         }
-	console.log(data);	
-	// LANGTAG
-//	if (langtag!="any"){
-//		var data={"query":{"bool":{"must": [mq, {"term": {"langtag": langtag }}]}}, "size": size};
-//	} else
-//		var data={"query": mq, "size": size};
+	fs.appendFile('logs.txt', JSON.stringify(data) + '\n', function(err){});
+	//if (aggregated){
+	//	data["aggs"]={"terms": {"field": "lit.subjecit"}};
+//	}
         request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: data}, function(error, response, body) {
                
-		console.log(body);
                 if (!error && response.statusCode == 200)
                 {
-                        callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
-        //                        return {"subject": o["_source"]["subject"], "predicate": o["_source"]["predicate"], "object": o["_source"]["string"], "docid": o["_source"]["docid"]};
-				return o["_source"];
-                        }));
+			//if (aggregated){
+			//	callback
+			//} else {
+				callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
+					return o["_source"];
+				}));
+			//}
                 }
         });
 
-}
-
-// Q1 and Q4
-function lookup_terms(q, size, langtag, callback){
-	if (langtag)
-                var data={ "query": { "bool": { "must": [{ "match": { "string": {"query": q, "minimum_should_match": "50%"}}}, { "term": {"langtag": langtag }}] }}, "size": size};
-	else
-		var data={"query": { "match": { "string": {"query": q, "minimum_should_match": "50%"} }}, "size": size};
-	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
-                logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
-		if (!error && response.statusCode == 200)
-		{
-			callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
-				o["_source"]["triple"]["docid"]=o["_source"]["docid"];
-				o["_source"]["triple"]["score"]=o["_score"];
-				return o["_source"]["triple"];
-			}));
-		}
-	});
-}
-
-// Q2 and Q3
-function lookup_phrase(q, size, langtag, callback){
-	var slop=3;
-	if (langtag)
-                var data={ "query": { "bool": { "must": [{ "match_phrase": { "string": {"query": q, "slop": slop}}}, { "term": {"langtag": langtag }}] }}, "size": size};
-	else
-		var data={"query": { "match_phrase": { "string": {"query": q, "slop": slop }}}, "size": size};
-	request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
-                logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
-		if (!error && response.statusCode == 200)
-		{
-                        callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
-                                o["_source"]["triple"]["docid"]=o["_source"]["docid"];
-                                o["_source"]["triple"]["score"]=o["_score"];
-                                return o["_source"]["triple"];
-			}));
-		} 
-	});
-}
-
-// Q5
-function conjunct_terms(q, size, langtag, callback){
-	
-        if (langtag)
-		var data = {"query": {"bool": { "must": [{"common": {"string": {"query": q, "cutoff_frequency": 0.85, "low_freq_operator": "and"}}}, { "term": {"langtag": langtag }}]}}, "size": size};
-	else
-		var data = {"query": {"common": {"string": {"query": q, "cutoff_frequency": 0.85, "low_freq_operator": "and"}}}, "size": size};
-        request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
-                logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
-                if (!error && response.statusCode == 200)
-                {
-                        callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
-                                o["_source"]["triple"]["docid"]=o["_source"]["docid"];
-                                o["_source"]["triple"]["score"]=o["_score"];
-                                return o["_source"]["triple"];
-                        }));
-                } 
-        });
-}
-
-// Q6
-function lookup_fuzzy_terms(q, size, langtag, fuzziness_level, callback){
-	if (langtag)
-        	var data={"query": {"bool": { "must": [{ "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and"} } }, { "term": {"langtag": langtag}}]}}, "size": size};
-	else
-        	var data={"query": { "match": { "string": { "query": q, "fuzziness": fuzziness_level, "operator": "and"} } }, "size": size};
-        request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: JSON.stringify(data)}, function(error, response, body) {
-		logRequest(error, response.statusCode.toString(), JSON.stringify(data), body["took"], body["hits"]["total"]);
-                if (!error && response.statusCode == 200)
-                {
-                        callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
-                                o["_source"]["triple"]["docid"]=o["_source"]["docid"];
-                                o["_source"]["triple"]["score"]=o["_score"];
-                                return o["_source"]["triple"];
-                        }));
-                }       
-	});
-}
-
-var logRequest = function(error, statusCode, ip, reqJson, took, numhits) {
-	fs.appendFile('reqs.txt', new Date().toISOString() + ' | ' +  error + ' | ' + statusCode + ' | ' + ip + '|' + reqJson + ' | ' + took + ' | ' + numhits + '\n', function (err){
-	});
 }
 
 
@@ -210,25 +128,17 @@ app.get('/', function(req, res){
     res.sendFile('index.html', {root:'./client'});
 });
 
+app.get('/fancy', function(req, res){
+    res.sendFile('fancy.html', {root:'./client'});
+});
+
 app.get('/docs', function(req, res){
     res.sendFile('docs.html', {root:'./client'});
 });
 
-app.get('/main.js', function(req, res){
-    res.sendFile('main.js', {root:'./client'});
-});
+app.use('/themes/default/assets/fonts', express.static('client/ldr'));
 
-app.get('/teal-lotus.ico', function(req, res){
-    res.sendFile('teal-lotus.ico', {root:'./client'});
-});
-
-app.get('/teal-lotus.svg', function(req, res){
-    res.sendFile('teal-lotus.svg', {root:'./client'});
-});
-
-app.get('/cssload.css', function(req, res){
-    res.sendFile('cssload.css', {root:'./client'});
-});
+app.use('/', express.static('client/static'));
 
 app.get('/retrieve', function(req, res){
 	slop=1;
@@ -240,20 +150,38 @@ app.get('/retrieve', function(req, res){
 		//     req.connection.remoteAddress || 
 		//     req.socket.remoteAddress ||
 		//     req.connection.socket.remoteAddress;
-		if (req.param('langannotator')=='auto')
-			var l='a_' + req.param('langtag');
-		else if (req.param('langannotator')=='other')
-                        var l='any';
-		else {
-			if (req.param('langtag')){
-				var l='u_' + req.param('langtag');
-			} else {
-				var l='dontcare';
+		try{
+			if (req.param('langannotator')=='auto')
+				var l='a_' + req.param('langtag');
+			else if (req.param('langannotator')=='other')
+				var l='any';
+			else {
+				if (req.param('langtag')){
+					var l='u_' + req.param('langtag');
+				} else {
+					var l='dontcare';
+				}
 			}
+			if (req.param('scorers')){
+				var scorers=JSON.parse(req.param('scorers'));
+			} else {
+				var scorers={};
+			}
+			console.log(req.param('string'));
+			retrieve(req.param('string'), l, req.param('start') || 0, req.param('size') || 10, req.param('match') || 'phrase', req.param('rank') || 'psf', req.param('slop') || 1, req.param('minmatch') || '70%', req.param('cutoff') || 0.001, req.param('fuzziness') || 1, req.param('subject'), req.param('predicate'), req.param('noblank')=="true", scorers, function(took, hits, cands){
+				
+
+				if (req.param('uniq')=='true')
+				{
+					cands=uniqBy(cands, 'subject');
+				} 
+				res.send({"took": took, "numhits": hits, 'returned': cands.length, 'hits': cands});
+				//var filtered = lodash(x, 'subject');
+				//res.send({"took": took, "numhits": hits, "hits": cands});
+			});
+		} catch(e){
+			res.send("Server Error.");
 		}
-		retrieve(req.param('string'), l, req.param('size') || 10, req.param('match') || 'phrase', req.param('rank') || 'psf', req.param('slop') || 1, req.param('minmatch') || '70%', req.param('cutoff') || 0.001, req.param('fuzziness') || 1, req.param('subject'), req.param('predicate'), req.param('noblank')=="true", JSON.parse(req.param('scorers')) || {}, function(took, hits, cands){
-			res.send({"took": took, "numhits": hits, "hits": cands});
-		});
 	} else{
 		res.send("Please supply a string parameter");
 	}
@@ -285,4 +213,6 @@ app.get('/fuzzyconjunct', function(req, res){
         });
 });
 */
-app.listen(8181);
+app.listen(8181, function() {
+	console.log('started LOTUS nodejs backend');
+});

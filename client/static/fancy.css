@@ -1,0 +1,110 @@
+body {
+margin:0px;
+}
+body.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.centered .banner {
+display:block;
+width:500px;
+}
+.centered .banner div {
+display:block;
+}
+.banner {
+width: 700px;
+display:inline;
+}
+.banner div {
+display: inline-block;
+margin: 0px 10px;
+}
+.icon img{
+width:80px;
+height: 80px;
+    display: block;
+    margin: 10px auto;
+}
+
+.navbar {
+height: 100px;
+}
+.centered .navbar {
+display:none;
+}
+
+.navbar div {
+display:inline-block;
+}
+
+.centered .results {
+display:none;
+}
+.results {
+margin-left: 120px;
+}
+.result {
+margin: 15px 0;
+}
+.result .title {
+  font-size:120%;
+}
+.result .subject {
+  color:blue;
+}
+.result .subjectDescr {
+  font-size:80%;
+}
+.searchBox{
+width:500px;
+}
+.searchBox .input {
+width: 500px;
+}
+.prompt {
+width: 500px;
+}
+#searchButton {
+margin: 10px auto;
+display: block;
+}
+
+#navBarBox {
+display:inline
+}
+.centered .info {
+display: none;
+height: 0px;
+width: 0px;
+margin: 0px;
+}
+.info {
+display: block;
+height: 50px;
+width: 100%;
+margin: 0px 120px;
+}
+ul.pages {
+    display: inline-block;
+    padding: 0;
+    margin: 0px 120px;
+}
+
+ul.pages li {display: inline;}
+
+ul.pages li a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+}
+
+ul.pages li a.active {
+    background-color: #017080;
+    color: white;
+}
+
+ul.pages li a:hover:not(.active) {background-color: #ddd;}
