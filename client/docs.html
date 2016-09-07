@@ -3,6 +3,7 @@
 <title> Documentation of LOTUS </title>
 
 <body>
+<label style="color:blue">ALL REQUESTS SHOULD BE SENT TO http://lotus.lodlaundromat.org/retrieve. <br/>Below you can find the full list of parameters that can be appended to the base URL. For each parameter we present its default value and an example set of values.</label>
 <table border="1">
 <thead><th>Parameter</th><th>Default value</th><th>Example value(s)</th><th>Comment</th></thead>
 <tr><td></td><td></td><td></td><td></td></tr>
@@ -11,6 +12,7 @@
 <tr><td>match</td><td>phrase</td><td>terms</td><td>matching algorithm, one of: terms, phrase, conjunct, fuzzyconjunct</td></tr>
 <tr><td>rank</td><td>psf</td><td>recency</td><td>ranking algorithm, one of: lengthnorm, psf, proximity, semrichness, termrichness, recency, degree, numdocs</td></tr>
 <tr><td>size</td><td>10</td><td>50</td><td>number of best scored results to be returned</td></tr>
+<tr><td>uniq</td><td>false</td><td>true<br/>false<br/></td><td>Deduplicate/Aggregate the results per subject</td></tr>
 <tr><td></td><td></td><td></td><td></td></tr>
 <tr><td><b>II. Optional filtering parameters</b></td><td></td><td></td><td></td></tr>
 <tr><td>subject</td><td>no default</td><td>http://dbpedia.org/resource/Chicago<br/>Chicago<br/>*dbpedia*<br/>"dbpedia" AND "Monkey"</td><td>filter by (part of) subject URI. To filter by single keywords or parts of a keyword, use wildcards. You can also use the logical operators: AND, OR, NOT.</td></tr>

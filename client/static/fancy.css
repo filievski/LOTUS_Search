@@ -58,17 +58,21 @@ margin: 15px 0;
   font-size:80%;
 }
 .searchBox{
-width:500px;
+width:475px;
 }
 .searchBox .input {
-width: 500px;
+width: 450px;
 }
 .prompt {
-width: 500px;
+width: 450px;
 }
 #searchButton {
 margin: 10px auto;
 display: block;
+}
+
+.dropdown {
+width: 170px;
 }
 
 #navBarBox {
@@ -108,3 +112,44 @@ ul.pages li a.active {
 }
 
 ul.pages li a:hover:not(.active) {background-color: #ddd;}
+
+.yellow .label {
+	width:200px;
+}
+
+.warning .message{
+	display: inline-block;
+	margin: 0px 55px;
+}
+
+.banner .ui div {
+display: inline-block;
+margin: 0px 10px;
+}
+.ui .yellow .label {
+width: 150px;
+}
+
+.subjectDescr a {
+    color: #017080;
+}
+
+.banner div {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+#expertUI {
+display:none;
+margin: 0px 100px;
+width:495px
+}
+
+.col-sm-4 {
+margin: 2px 10px;
+}
+
+#lang {
+width:170px;
+}

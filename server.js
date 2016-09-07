@@ -128,8 +128,8 @@ app.get('/', function(req, res){
     res.sendFile('index.html', {root:'./client'});
 });
 
-app.get('/fancy', function(req, res){
-    res.sendFile('fancy.html', {root:'./client'});
+app.get('/eswc', function(req, res){
+    res.sendFile('iswc.html', {root:'./client'});
 });
 
 app.get('/docs', function(req, res){
