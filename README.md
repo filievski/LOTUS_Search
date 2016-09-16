@@ -1,6 +1,8 @@
 # LOTUS: Linked Open Text Unleashed
 API and web interface of LOTUS, award-winning full-text index to the LOD Laundromat, and the largest available LOD index today.
 
+LOTUS was developed at VU University Amsterdam, as a collaboration between CLTL and the Knowledge Representation & Reasoning departments.
+
 ## Documentation
 
 See http://lotus.lodlaundromat.org/docs for detailed description of the API parameters.
