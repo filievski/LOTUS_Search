@@ -1,13 +1,13 @@
 # LOTUS: Linked Open Text Unleashed
-API and website of LOTUS, full-text index to the LOD Laundromat
+API and web interface of LOTUS, award-winning full-text index to the LOD Laundromat, and the largest available LOD index today.
 
 ## Documentation
 
 See http://lotus.lodlaundromat.org/docs for detailed description of the API parameters.
 
-##Website
+##Web interface
 
-Also, try our website interface at http://lotus.lodlaundromat.org/ or http://lodsearch.org. 
+Also, try our web interface at http://lotus.lodlaundromat.org/ or http://lodsearch.org. 
 Note: While the visual appearance of LOTUS has been changed since it has been presented at ESWC 2016, its functionality has been kept unchanged. The ESWC 2016 interface of LOTUS is still functional and can be accessed at http://lodsearch.org/eswc.
 
 ##Additional materials
