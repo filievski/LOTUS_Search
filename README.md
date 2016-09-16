@@ -26,3 +26,6 @@ http://ceur-ws.org/Vol-1426/paper-06.pdf
 ##Awards
 
 The LOTUS Semantic Search engine was awarded the 2nd place in the European Linked Open Data Competition 2016 (http://2016.semantics.cc/eldc).
+
+##Contact
+Filip Ilievski (f.ilievski@vu.nl)
