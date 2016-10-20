@@ -144,6 +144,8 @@ var initDt = function(formEl) {
     else var noblank="false";
         var uri = '/retrieve?string=' + encodeURIComponent($('#r2dUri').val()) + "&match=" + $("#matching").val() + "&rank=" + $("#ranking").val() + "&size=" + $("#recordsize").val() + "&langtag=" + encodeURIComponent($("#langtag").val()) + "&noblank=" + noblank;
 		$("#circularG").show();
+         e.preventDefault();
+	//location.href = 'http://lodsearch.org' + uri;
 $.get( uri, function( hitsdata ) {
 		var hits=hitsdata["hits"];
  		//$("#stats").html("Took <strong>" + data["took"] + "</strong> ms for <strong>" + data["hits"]["total"] + "</strong> records.");
@@ -158,6 +160,7 @@ $.get( uri, function( hitsdata ) {
 		oTable.show();
 		console.log(hits);
     });
+    window.location.assign(uri);
 }
 
 function numberWithCommas(x) {

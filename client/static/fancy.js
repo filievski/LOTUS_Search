@@ -3,9 +3,75 @@ var NUMPAGES = 0;
 var NUMHITS=0;
 var TOOK="";
 
+var getParams = function(){
+	var params = {};
+
+	if (location.hash) {
+	    var parts = location.hash.substring(2).split('&');
+
+	    for (var i = 0; i < parts.length; i++) {
+		var nv = parts[i].split('=');
+		if (!nv[0]) continue;
+		if (!nv[1]) continue;
+		params[nv[0]] = nv[1];
+	    }
+	}
+	return params;
+}
+
+$( document ).ready(function() {
+	populateControls();
+});
+
+var populateControls = function(){
+	var params = getParams();
+	if (params.q) {
+		if (decodeURIComponent(params.q)!=$("#centerBox").val()){
+			moveBoxToCorner();//make sure we've got a proper layout to show the results
+			$("#centerBox").val(decodeURIComponent(params.q));
+		}
+		// Langtag
+		if (params.langtag && params.langtag!=$("#lang").val())
+		{
+			$("#lang").val(params.langtag.substring(0,2));
+		} else {
+			$("#lang").val("");
+		}
+		// Match
+		if (params.match && params.match!=$("#matcher").val() && $("#matcher option[value='" + params.match + "']").length > 0)
+		{
+			$("#matcher").val(params.match);
+		} else {
+			$("#matcher").val("phrase");
+		}
+		// Rank
+		if (params.rank && params.rank!=$("#ranker").val() && $("#ranker option[value='" + params.rank + "']").length > 0)
+			$("#ranker").val(params.rank);
+		else 
+			$("#ranker").val("lengthnorm");
+	}
+}
+
+var populateHash = function(){
+	location.hash = "?q=" + encodeURIComponent($("#centerBox").val()) + "&match=" + $("#matcher").val() + "&rank=" + $("#ranker").val() + "&langtag=" + $("#lang").val();
+}
+
+$(window).on('hashchange', function() {
+	populateControls();
+//  add hash text to the field (ONLY when hash text is different than current value)
+//do not exec query
+
+//put this all in a different function. and call this function to document.ready as well
+});
+
 $("#centerBox").keyup(function(event){
     if(event.keyCode == 13){
         $("#searchButton").click();
+    } else if ($("#centerBox").val()){
+	populateHash();
+        //location.hash = "?q=" + encodeURIComponent($("#centerBox").val());
+    } else {
+	location.hash = "";
     }
 });
 
@@ -15,17 +81,34 @@ $("#matcher").keyup(function(event){
     }
 });
 
+$("#matcher").change(function(){
+	populateHash();
+});
+
 $("#ranker").keyup(function(event){
     if(event.keyCode == 13){
         $("#searchButton").click();
     }
 });
 
+$("#ranker").change(function(){
+        populateHash();
+});
+
 $("#lang").keyup(function(event){
     if(event.keyCode == 13){
         $("#searchButton").click();
+    } else if ($("#centerBox").val()){
+        populateHash();
+    } else {
+        location.hash = "";
     }
 });
+
+
+//$("#centerBox").keydown(function(event){
+//	location.hash = "q=" + $("#centerBox").val();
+//});
 
 var showHideSettings=function(){
 	if ($("#expertUI").is(":visible")) {
@@ -39,9 +122,8 @@ var showHideSettings=function(){
 }
 
 var moveBoxToCorner=function(){
-	$("body").removeClass("centered");
+	$("body").removeClass("centered").addClass("cornered");
 	$("#navBarBox").val($("#centerBox").val());
-	$(".brown").show();
 };
 
 var changePage=function(toThis){
@@ -108,8 +190,10 @@ var queryLotus=function(){
         if (string!=""){
 		cleanAll();
 		RESULTS={};
-                var reqUrl="http://lotus.lodlaundromat.org/retrieve?size=5000&noblank=true&predicate=label&uniq=true&string=" + string + "&match=" + $("#matcher").val() + "&rank=" + $("#ranker").val() + "&langtag=" + $("#lang").val();
-		console.log(reqUrl);
+		var retrieveUrl = "/retrieve";
+                var reqUrl= retrieveUrl + "?size=5000&noblank=true&predicate=label&uniq=true&string=" + string + "&match=" + $("#matcher").val() + "&rank=" + $("#ranker").val() + "&langtag=" + $("#lang").val();
+		var redirectUrl = "/?size=5000&noblank=true&predicate=label&uniq=true&string=" + string + "&match=" + $("#matcher").val() + "&rank=" + $("#ranker").val() + "&langtag=" + $("#lang").val();
+		//window.location = "/" + redirectUrl;
                 $.get(reqUrl, function(response, status){
                         NUMPAGES=parseInt((response["returned"]-1)/10)+1;
 			NUMHITS=formatNumber(response["numhits"]);

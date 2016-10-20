@@ -1,6 +1,13 @@
 body {
 margin:0px;
 }
+
+.centered .brown {
+	display:none;
+}
+.cornered .brown {
+	display: block;
+}
 body.centered {
   display: flex;
   align-items: center;
