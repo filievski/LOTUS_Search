@@ -2,7 +2,7 @@ var RESULTS = {};
 var NUMPAGES = 0;
 var NUMHITS=0;
 var TOOK="";
-
+var CENTER_BOX = null;
 var getParams = function(){
 	var params = {};
 
@@ -20,7 +20,12 @@ var getParams = function(){
 }
 
 $( document ).ready(function() {
+	CENTER_BOX = $("#centerBox");
+	if (CENTER_BOX.val()){
+		moveBoxToCorner();
+	}
 	populateControls();
+	queryLotus();
 });
 
 var populateControls = function(){
@@ -34,21 +39,24 @@ var populateControls = function(){
 		if (params.langtag && params.langtag!=$("#lang").val())
 		{
 			$("#lang").val(params.langtag.substring(0,2));
-		} else {
+		} else if (params.langtag==""){
 			$("#lang").val("");
 		}
 		// Match
 		if (params.match && params.match!=$("#matcher").val() && $("#matcher option[value='" + params.match + "']").length > 0)
 		{
 			$("#matcher").val(params.match);
-		} else {
-			$("#matcher").val("phrase");
-		}
+		} 
+		//else {
+		//	$("#matcher").val("phrase");
+		//}
 		// Rank
 		if (params.rank && params.rank!=$("#ranker").val() && $("#ranker option[value='" + params.rank + "']").length > 0)
+		{
 			$("#ranker").val(params.rank);
-		else 
-			$("#ranker").val("lengthnorm");
+		}
+		//else 
+		//	$("#ranker").val("lengthnorm");
 	}
 }
 
@@ -110,6 +118,7 @@ $("#lang").keyup(function(event){
 //	location.hash = "q=" + $("#centerBox").val();
 //});
 
+
 var showHideSettings=function(){
 	if ($("#expertUI").is(":visible")) {
 		$(".brown").attr("title", "Show expert panel");
@@ -168,7 +177,7 @@ var addLinks=function(current){
 	}
 	for (var j=minPage; j<=maxPage; j++){
 		if (current!=j){
-			$(".pages").append('<li><a class="page" href="#" onclick=changePage(' + j + ')>' + j + '</a></li>');
+			$(".pages").append('<li><a class="page" href="javascript:void(0)" onclick=changePage(' + j + ')>' + j + '</a></li>');
 		} else {
                         $(".pages").append('<li><a class="page active" href="#">' + j + '</a></li>');
 		}
@@ -193,7 +202,6 @@ var queryLotus=function(){
 		var retrieveUrl = "/retrieve";
                 var reqUrl= retrieveUrl + "?size=5000&noblank=true&predicate=label&uniq=true&string=" + string + "&match=" + $("#matcher").val() + "&rank=" + $("#ranker").val() + "&langtag=" + $("#lang").val();
 		var redirectUrl = "/?size=5000&noblank=true&predicate=label&uniq=true&string=" + string + "&match=" + $("#matcher").val() + "&rank=" + $("#ranker").val() + "&langtag=" + $("#lang").val();
-		//window.location = "/" + redirectUrl;
                 $.get(reqUrl, function(response, status){
                         NUMPAGES=parseInt((response["returned"]-1)/10)+1;
 			NUMHITS=formatNumber(response["numhits"]);

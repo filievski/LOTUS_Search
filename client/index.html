@@ -7,11 +7,12 @@
 <body class="centered">
 <div class="banner">
 <div class="icon">
-<a href="http://lotus.lodlaundromat.org">
+<a href="/">
 <img src="teal-lotus.svg"/></a>
 </div>
 <div class="searchBox" onkeypress="moveBoxToCorner()" data-toggle="tooltip" title="Type a query and press ENTER to search in the LOD Cloud.">
-<div class="ui large icon input" data-reactid="21"><input type="text" class="prompt" placeholder="Search Linked Open Data..." id="centerBox" data-reactid="22" autofocus="autofocus"><i class="search icon" data-reactid="23"></i></div>
+<div class="ui large icon input" data-reactid="21"><input type="text" class="prompt" placeholder="Search Linked Open Data..." id="centerBox" data-reactid="22" autofocus="autofocus">
+<i id="magnifier" class="search icon" data-reactid="23"></i></div>
 </div>
 <div class="searchButton">
 <button class="ui button" id="searchButton" data-reactid="25" onclick="queryPageOne()" data-toggle="tooltip" title="Type a query and press ENTER to search in the LOD Cloud.">LOD Search</button>
@@ -21,7 +22,7 @@
 </div>
 <div class="ui" id="expertUI" data-reactid="29"><br data-reactid="30"><div><div class="ui left aligned warning message"><i class="close icon" onclick="showHideSettings()"></i>
 <div class="row">
-<label style="margin:3px 10px">Expert pannel (hover over the options for HELP)</label>
+<label style="margin:3px 10px">Expert panel (hover over the options for HELP)</label>
 <div style="margin:3px 10px" data-toggle="tooltip" title="How to MATCH the results: a) phrase (substring matching); b) conjunct (match all query terms); c) terms (match at least one query term); d) fuzzyconjunct (match all query terms, but allow for one typo/spelling error)">
 <div class="ui labeled input"><div class="ui blue label" style="width:120px">Matcher</div><select id="matcher" class="ui search dropdown"><option value="terms"> terms </option><option value="phrase" selected> phrase </option><option value="conjunct"> conjunct </option><option value="fuzzyconjunct"> fuzzyconjunct </option></select></div>
 </div><div style="margin:3px 10px">
