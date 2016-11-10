@@ -145,7 +145,7 @@ app.get('/retrieve', function(req, res){
 	slop=1;
         minmatch="70%";
         fuzziness_level=1;
-        cutoff_freq=0.001;
+        cutoff_freq=0.01;
 	if (!req.param('string')) return res.send('Please supply a string parameter');
 	//var ip = req.headers['x-forwarded-for'] || 
 	//     req.connection.remoteAddress || 
