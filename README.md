@@ -7,12 +7,12 @@ LOTUS was developed at VU University Amsterdam, as a collaboration between CLTL 
 
 See http://lotus.lodlaundromat.org/docs for detailed description of the API parameters.
 
-##Web interface
+## Web interface
 
 Also, try our web interface at http://lotus.lodlaundromat.org/ or http://lodsearch.org. 
 Note: While the visual appearance of LOTUS has been changed since it has been presented at ESWC 2016, its functionality has been kept unchanged. The ESWC 2016 interface of LOTUS is still functional and can be accessed at http://lodsearch.org/eswc.
 
-##Additional materials
+## Additional materials
 
  Video from ESWC 2016's presentation on LOTUS http://videolectures.net/eswc2016_ilievski_linked_data/
 
@@ -25,9 +25,9 @@ http://www.slideshare.net/FilipIlievski1/lotus-adaptive-text-search-for-big-link
 Workshop paper from the ISWC 2015 COLD Workshop
 http://ceur-ws.org/Vol-1426/paper-06.pdf
 
-##Awards
+## Awards
 
 The LOTUS Semantic Search engine was awarded the 2nd place in the European Linked Open Data Competition 2016 (http://2016.semantics.cc/eldc).
 
-##Contact
+## Contact
 Filip Ilievski (f.ilievski@vu.nl)
