@@ -36,7 +36,7 @@ You are welcome to set up your own LOTUS engine. Please note that **setting a lo
 Provided that you have already prepared your LOTUS index with statements in ElasticSearch, you can easily set up this code to query that data with the same functionality as in the central LOTUS system. Steps:
 1. Make sure that your version of Node.js is not too old (this code has been tested on v4.2 and v8.6.0.)
 2. Run `npm install` or `npm install -g` to install all dependencies: `express`, `lodash/uniqBy` and `request`.
-3. To start the LOTUS API server, simply run `node server.js`. Make sure to set the `query_url` parameter to your own Elastic endpoint (currently, we use a protected one whose authentication details we read from the file `config.json` - but setting `isCentralLOTUS` to false and setting your own `query_url` will do the trick for your own endpoint). Also, the port 8181 should be available, or you should change this setting in the final lines of the `server.js` script to another one that you are sure is free.
+3. To start the LOTUS API server, simply run `node server.js`. Make sure the `query_url` variable in this script points to your own Elastic endpoint (currently, we use a protected endpoint whose authentication details we read from the file `config.json` - but setting `isCentralLOTUS` to false and setting your own `query_url` will do the trick for your own endpoint with your own configuration). Also, the port 8181 should be available, or you should change this setting in the final lines of the `server.js` script to another port that you are sure is free.
 
 ## Contact
 Filip Ilievski (f.ilievski@vu.nl)
