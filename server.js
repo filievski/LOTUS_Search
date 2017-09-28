@@ -3,15 +3,21 @@ var express = require('express');
 var app = express();
 var request = require('request');
 var fs = require('fs');
-var configurationFile = 'config.json';
 var uniqBy = require('lodash/uniqBy');
 
+var isCentralLOTUS = true;
 
-var configuration = JSON.parse(
-    fs.readFileSync(configurationFile)
-);
+if (isCentralLOTUS){
+    var configurationFile = 'config.json';
 
-var query_url = 'https://' + configuration.auth + '@lotus.lucy.surfsara.nl/lotus/_search';
+    var configuration = JSON.parse(
+        fs.readFileSync(configurationFile)
+    );
+
+    var query_url = 'https://' + configuration.auth + '@lotus.lucy.surfsara.nl/lotus/_search';
+} else {
+    var query_url = ''; //TODO: If you are setting up your own lotus endpoint, setup your query URL here with optional username and password
+}
 
 var numeric_ranks = {"degree": "degree", "numdocs": "r2d", "recency": "timestamp", "lengthnorm": "length", "semrichness": "sr", "termrichness": "tr"};
 
@@ -31,8 +37,6 @@ function retrieve(o, callback){
 
         if (o.rank in numeric_ranks){ // Relational ranking
                 key=numeric_ranks[o.rank];
-		//if (key=="degree" || key=="r2d")
-		//	query_url='https://' + configuration.auth + '@lotus.lucy.surfsara.nl/lotus22/_search';
 		var must=mq;
 			if (o.langtag!="dontcare") must.push({"term": {"langtag": o.langtag }});
                 var data={ "query": { "function_score": { "query": {"bool": {"must": must}} , "field_value_factor": { "field": key }, "boost_mode": "replace" } }, "size": o.size, "from": o.start };
@@ -42,7 +46,6 @@ function retrieve(o, callback){
 			data["query"]["function_score"]["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.subject", "query": o.subject}});
 		}
 		if (o.predicate){
-			//data.query.function_score.query.bool.must.push()
 			data["query"]["function_score"]["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.predicate", "query": o.predicate}});
 		} 
 		if (o.noblank){
@@ -55,14 +58,10 @@ function retrieve(o, callback){
 		var must=mq;
 		if (o.langtag!="dontcare") must.push({"term": {"langtag": o.langtag }});
 		var func=[];
-		//var scorers={"length":0.5, "timestamp":0.1, "tr": 0.4};
 		var keys=Object.keys( o.scorers );
 		for( var i = 0,length = keys.length; i < length; i++ ) {
 			func.push({"field_value_factor": {"field": keys[i], "factor": o.scorers[keys[i]]}}); 
 		}
-//		for (var scorer in scorers){
-//			func.push({"field_value_factor": {"field": scorers, "factor": scorers[scorer]}});	
-//		}		
 		var data={ "query": { "function_score": { "query": {"bool": {"must": must}} , "functions": func, "boost_mode": "replace", "score_mode": "sum" } }, "size": o.size};	
                 if (o.subject){
                         data["query"]["function_score"]["query"]["bool"]["must"].push({"query_string": {"default_field": "lit.subject", "query": o.subject}});
@@ -85,11 +84,7 @@ function retrieve(o, callback){
                 else if (o.rank=="psf"){
 			var must=mq;
 				if (o.langtag!="dontcare") must.push({"term": {"langtag": o.langtag }});
-				//if (subject!="") must.push({"term": {"subject": subject }});
-				//if (predicate!="") must.push({"term": {"predicate": "http://era.rkbexplorer.com/id/title" }});
                         var data={"query": {"bool":{"must": must}}, "size": o.size, "from": o.start};
-                        //} else
-                        //        var data={"query": mq, "size": size};
                 }
 
 		if (o.subject){
@@ -104,22 +99,15 @@ function retrieve(o, callback){
 
         }
 	fs.appendFile('logs.txt', JSON.stringify(data) + '\n', function(err){});
-	//if (aggregated){
-	//	data["aggs"]={"terms": {"field": "lit.subjecit"}};
-//	}
         request({url: query_url, method: 'POST', json: true, headers: { "content-type": "application/json" }, body: data}, function(error, response, body) {
                
                 if (!error && response.statusCode == 200)
                 {
-			//if (aggregated){
-			//	callback
-			//} else {
 				callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
 					rtn=o["_source"];
 					rtn["score"]=o["_score"];
 					return rtn;
 				}));
-			//}
                 }
         });
 }
@@ -149,10 +137,6 @@ app.get('/retrieve', function(req, res){
         fuzziness_level=1;
         cutoff_freq=0.01;
 	if (!req.param('string')) return res.send('Please supply a string parameter');
-	//var ip = req.headers['x-forwarded-for'] || 
-	//     req.connection.remoteAddress || 
-	//     req.socket.remoteAddress ||
-	//     req.connection.socket.remoteAddress;
 	try{
 
 		// Prepare the more complex parameters
@@ -203,32 +187,6 @@ app.get('/retrieve', function(req, res){
 	}
 });
 
-
-/*
-app.get('/phrase', function(req, res){
-	lookup_phrase(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
-                res.send({"took": took, "numhits": hits, "hits": cands});
-	});
-});
-
-app.get('/terms', function(req, res){
-        lookup_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
-                res.send({"took": took, "numhits": hits, "hits": cands});
-        });
-});
-
-app.get('/conjunct', function(req, res){
-        conjunct_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", function(took, hits, cands){
-                res.send({"took": took, "numhits": hits, "hits": cands});
-        });
-});
-
-app.get('/fuzzyconjunct', function(req, res){
-        lookup_fuzzy_terms(req.param('pattern'), req.param('size') || 10, req.param('langtag') || "", req.param('fuzziness') || 1, function(took, hits, cands){
-                res.send({"took": took, "numhits": hits, "hits": cands});
-        });
-});
-*/
 app.listen(8181, function() {
 	console.log('started LOTUS nodejs backend');
 });
