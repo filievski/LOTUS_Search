@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/filipdbrsk/LOTUS_Search#readme",
   "dependencies": {
+    "express": "^4.15.5",
     "lodash": "~4.17.x",
     "request": "^2.64.0"
   }
