@@ -17,7 +17,7 @@ Note: While the visual appearance of LOTUS has been changed since it has been pr
  Video from ESWC 2016's presentation on LOTUS http://videolectures.net/eswc2016_ilievski_linked_data/
 
 Research paper from ESWC 2016
-http://link.springer.com/chapter/10.1007\%2F978-3-319-34129-3_29
+https://link.springer.com/chapter/10.1007/978-3-319-34129-3_29
 
 Slides from ESWC 2016's presentation on LOTUS
 http://www.slideshare.net/FilipIlievski1/lotus-adaptive-text-search-for-big-linked-data
