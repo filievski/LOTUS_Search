@@ -31,10 +31,10 @@ The LOTUS Semantic Search engine was awarded the 2nd place in the European Linke
 
 ## Installation guide
 
-You are welcome to set up your own LOTUS engine. Please note that **setting a local copy of LOTUS requires one both: to index statements (see the LOTUS Indexer github) and to set up a search API (using the code from this project)**. 
+You are welcome to set up your own LOTUS engine. Please note that **setting a local copy of LOTUS requires both: to index a set of statements (see the LOTUS Indexer github[https://github.com/filipdbrsk/LOTUS_Indexer] for the indexing procedure used in the official LOTUS) and to set up a search API (using the code from this project)**. 
 
-Provided that you have already prepared your LOTUS index in ElasticSearch, you can easily set up this code to query that data with the same functionality as in the central LOTUS system. Steps:
-1. First, make sure that your version of Node.js is not too old (this code has been tested on v4.2 and v8.6.0.)
+Provided that you have already prepared your LOTUS index with statements in ElasticSearch, you can easily set up this code to query that data with the same functionality as in the central LOTUS system. Steps:
+1. Make sure that your version of Node.js is not too old (this code has been tested on v4.2 and v8.6.0.)
 2. Run `npm install` or `npm install -g` to install all dependencies: `express`, `lodash/uniqBy` and `request`.
 3. To start the LOTUS API server, simply run `node server.js`. Make sure to set the `query_url` parameter to your own Elastic endpoint (currently, we use a protected one whose authentication details we read from the file `config.json` - but setting `isCentralLOTUS` to false and setting your own `query_url` will do the trick for your own endpoint). Also, the port 8181 should be available, or you should change this setting in the final lines of the `server.js` script to another one that you are sure is free.
 
