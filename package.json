@@ -1,0 +1,34 @@
+{
+  "name": "lotussearch",
+  "version": "1.0.0",
+  "description": "API of the lotus LOD index",
+  "main": "server.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/filipdbrsk/LOTUS_Search.git"
+  },
+  "keywords": [
+    "literals",
+    "LOD",
+    "semantic",
+    "web",
+    "search"
+  ],
+  "author": "Filip Ilievski",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/filipdbrsk/LOTUS_Search/issues"
+  },
+  "homepage": "https://github.com/filipdbrsk/LOTUS_Search#readme",
+  "dependencies": {
+    "lodash": "~3.3",
+    "request": "^2.64.0"
+  }
+}
