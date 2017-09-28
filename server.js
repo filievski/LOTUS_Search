@@ -115,7 +115,9 @@ function retrieve(o, callback){
 			//	callback
 			//} else {
 				callback(body["took"], body["hits"]["total"], body["hits"]["hits"].map(function(o){
-					return o["_source"];
+					rtn=o["_source"];
+					rtn["score"]=o["_score"];
+					return rtn;
 				}));
 			//}
                 }
